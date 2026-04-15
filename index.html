@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>股票自選清單</title>
+<style>
+/* ── Theme variables ───────────────────────────────────────── */
+:root {
+  --bg:    #0a0e14; --bg2:   #111827; --bg3:   #1c2333;
+  --bd:    #1f2937; --bd2:   #374151;
+  --t1:    #e5e7eb; --t2:    #9ca3af; --t3:    #6b7280; --t4:    #4b5563;
+  --accent:#60a5fa; --up:#f87171; --down:#34d399;
+  --badge-open-bg:rgba(52,211,153,.15);  --badge-open-fg:#34d399;
+  --badge-pre-bg:rgba(96,165,250,.15);   --badge-pre-fg:#93c5fd;
+  --badge-post-bg:rgba(251,191,36,.15);  --badge-post-fg:#fbbf24;
+}
+body.light {
+  --bg:    #f1f5f9; --bg2:   #ffffff; --bg3:   #f8fafc;
+  --bd:    #e2e8f0; --bd2:   #cbd5e1;
+  --t1:    #1e293b; --t2:    #475569; --t3:    #64748b; --t4:    #94a3b8;
+  --accent:#2563eb; --up:#dc2626; --down:#16a34a;
+  --badge-open-bg:rgba(22,163,74,.12);   --badge-open-fg:#15803d;
+  --badge-pre-bg:rgba(37,99,235,.12);    --badge-pre-fg:#2563eb;
+  --badge-post-bg:rgba(217,119,6,.15);   --badge-post-fg:#b45309;
+}
+
+/* ── Reset & base ───────────────────────────────────────────── */
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  background:var(--bg);color:var(--t1);
+  font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,'Microsoft JhengHei',sans-serif;
+  min-height:100vh;padding-bottom:46px;
+  transition:background .2s,color .2s;
+}
+
+/* ── Header ─────────────────────────────────────────────────── */
+header{
+  background:var(--bg2);border-bottom:1px solid var(--bd);
+  padding:9px 14px;display:flex;align-items:center;
+  justify-content:space-between;position:sticky;top:0;z-index:100;
+  gap:8px;flex-wrap:wrap;
+}
+.logo{font-size:15px;font-weight:700;color:var(--accent);white-space:nowrap}
+.logo span{color:var(--up)}
+.hright{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.lupdate{font-size:11px;color:var(--t3);white-space:nowrap}
+
+.btn{
+  background:var(--bg3);border:1px solid var(--bd2);color:var(--t2);
+  padding:5px 9px;border-radius:5px;cursor:pointer;font-size:12px;
+  white-space:nowrap;transition:all .15s;font-family:inherit;
+}
+.btn:hover{background:var(--bd);color:var(--t1)}
+.btn-blue{background:#1d4ed8;border-color:#2563eb;color:#bfdbfe}
+.btn-blue:hover{background:#2563eb;color:#fff}
+.btn-green{background:#065f46;border-color:#059669;color:#6ee7b7}
+.btn-green:hover{background:#059669;color:#fff}
+.btn-red{background:#7f1d1d;border-color:#dc2626;color:#fca5a5}
+.btn-red:hover{background:#dc2626;color:#fff}
+body.light .btn-blue{background:#dbeafe;border-color:#93c5fd;color:#1d4ed8}
+body.light .btn-blue:hover{background:#bfdbfe;color:#1e40af}
+body.light .btn-green{background:#d1fae5;border-color:#6ee7b7;color:#065f46}
+body.light .btn-green:hover{background:#a7f3d0;color:#064e3b}
+body.light .btn-red{background:#fee2e2;border-color:#fca5a5;color:#991b1b}
+body.light .btn-red:hover{background:#fecaca;color:#7f1d1d}
+
+/* ── Layout ─────────────────────────────────────────────────── */
+main{padding:11px 11px 0;max-width:1600px;margin:0 auto}
+.section{margin-bottom:18px}
+.sec-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:7px;padding:5px 10px;background:var(--bg2);
+  border-radius:6px;border-left:3px solid var(--accent);
+}
+.sec-title{font-size:13px;font-weight:700;color:var(--t1);display:flex;align-items:center;gap:5px}
+.sec-meta{font-size:11px;color:var(--t3);display:flex;align-items:center;gap:7px}
+
+/* ── Grid ───────────────────────────────────────────────────── */
+.grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(152px,1fr));gap:5px;min-height:10px;
+}
+@media(max-width:420px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:900px){.grid{grid-template-columns:repeat(auto-fill,minmax(165px,1fr))}}
+@media(min-width:1400px){.grid{grid-template-columns:repeat(auto-fill,minmax(175px,1fr))}}
+
+/* ── Card ───────────────────────────────────────────────────── */
+.card{
+  background:var(--bg2);border:1px solid var(--bd);border-radius:6px;
+  padding:9px 10px 7px;cursor:grab;position:relative;user-select:none;
+  min-height:88px;transition:border-color .15s,background .15s;
+}
+.card:hover{border-color:var(--bd2);background:var(--bg3)}
+.card:active{cursor:grabbing}
+.card.sortable-ghost{opacity:.2;background:var(--bg3)}
+.card.sortable-chosen{box-shadow:0 4px 18px rgba(0,0,0,.45);z-index:10;cursor:grabbing}
+body.light .card.sortable-chosen{box-shadow:0 4px 18px rgba(0,0,0,.15)}
+
+.cname{font-size:11px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:1px;padding-right:18px}
+.ccode{font-size:10px;color:var(--t4);margin-bottom:5px}
+.cprice{font-size:17px;font-weight:700;font-family:'Courier New','Consolas',monospace;letter-spacing:.4px;margin-bottom:3px;line-height:1.1}
+.cchg{font-size:11px;display:flex;gap:3px;align-items:center;flex-wrap:wrap;margin-bottom:4px}
+.cfoot{display:flex;align-items:center;gap:5px;min-height:14px}
+.ctime{font-size:9px;color:var(--t4)}
+.mbadge{font-size:9px;padding:1px 4px;border-radius:3px;font-weight:600;line-height:1.4}
+.mbadge.open{background:var(--badge-open-bg);color:var(--badge-open-fg)}
+.mbadge.pre {background:var(--badge-pre-bg); color:var(--badge-pre-fg)}
+.mbadge.post{background:var(--badge-post-bg);color:var(--badge-post-fg)}
+
+.up{color:var(--up)} .down{color:var(--down)} .neutral{color:var(--t3)}
+.loading-p{color:var(--t4);font-size:14px}
+.errmsg{color:var(--t4);font-size:10px;font-style:italic}
+
+.delbtn{
+  position:absolute;top:5px;right:5px;background:none;border:none;
+  color:var(--t4);cursor:pointer;font-size:14px;line-height:1;padding:1px 3px;
+  border-radius:3px;transition:all .15s;display:none;
+}
+.card:hover .delbtn{display:block}
+.delbtn:hover{color:var(--up);background:rgba(248,113,113,.12)}
+body.light .delbtn:hover{background:rgba(220,38,38,.1)}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{
+  display:inline-block;width:10px;height:10px;
+  border:2px solid var(--bd2);border-top-color:var(--accent);
+  border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;
+}
+
+/* ── Progress bar ───────────────────────────────────────────── */
+.pbar{height:2px;background:var(--bd);position:fixed;top:0;left:0;right:0;z-index:200}
+.pprog{height:100%;background:var(--accent);width:0%;transition:width .3s}
+
+/* ── Modal ──────────────────────────────────────────────────── */
+.overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);
+  z-index:500;align-items:center;justify-content:center;padding:14px;
+}
+body.light .overlay{background:rgba(0,0,0,.4)}
+.overlay.show{display:flex}
+.modal{
+  background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;
+  padding:20px;width:100%;max-width:360px;
+}
+.modal h3{color:var(--t1);font-size:15px;margin-bottom:14px}
+.field{margin-bottom:10px}
+.field label{display:block;font-size:11px;color:var(--t2);margin-bottom:3px}
+.field input{
+  width:100%;background:var(--bg);border:1px solid var(--bd2);color:var(--t1);
+  padding:7px 10px;border-radius:5px;font-size:13px;font-family:inherit;
+}
+.field input:focus{outline:none;border-color:var(--accent)}
+.fhint{font-size:10px;color:var(--t3);margin-top:3px}
+.mbtns{display:flex;gap:6px;justify-content:flex-end;margin-top:14px}
+
+/* ── Status bar ─────────────────────────────────────────────── */
+.sbar{
+  background:var(--bg2);border-top:1px solid var(--bd);
+  padding:5px 14px;font-size:10px;color:var(--t4);
+  position:fixed;bottom:0;left:0;right:0;
+  display:flex;gap:10px;align-items:center;
+}
+.sdot{width:6px;height:6px;border-radius:50%;background:var(--bd2);flex-shrink:0}
+.sdot.live{background:#34d399;box-shadow:0 0 5px #34d39977}
+.sdot.loading{background:var(--accent);animation:pulse 1s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+body.light .sdot.live{background:#16a34a;box-shadow:0 0 5px #16a34a66}
+</style>
+</head>
+<body>
+
+<div class="pbar"><div class="pprog" id="prog"></div></div>
+
+<header>
+  <div class="logo">📈 股票<span>自選</span>清單</div>
+  <div class="hright">
+    <span class="lupdate" id="lupdate">尚未更新</span>
+    <button class="btn" onclick="refreshAll(true)">↻ 更新</button>
+    <button class="btn btn-blue" onclick="openAdd('tw')">＋ 台股</button>
+    <button class="btn btn-green" onclick="openAdd('us')">＋ 美股</button>
+    <button class="btn" id="themeBtn" onclick="toggleTheme()" title="切換深色/淡色">☀</button>
+    <button class="btn" onclick="openReset()" style="font-size:11px">⚙ 重設</button>
+  </div>
+</header>
+
+<main>
+  <div class="section">
+    <div class="sec-hdr">
+      <div class="sec-title">🇹🇼 台股</div>
+      <div class="sec-meta"><span id="twCount"></span><span style="color:var(--bd2)">｜</span><span>↕ 拖拉排序</span></div>
+    </div>
+    <div class="grid" id="twGrid"></div>
+  </div>
+  <div class="section">
+    <div class="sec-hdr" style="border-left-color:#10b981">
+      <div class="sec-title">🇺🇸 美股</div>
+      <div class="sec-meta"><span id="usCount"></span><span style="color:var(--bd2)">｜</span><span>↕ 拖拉排序</span></div>
+    </div>
+    <div class="grid" id="usGrid"></div>
+  </div>
+</main>
+<div style="height:8px"></div>
+
+<div class="sbar">
+  <div class="sdot" id="sdot"></div>
+  <span id="stext">初始化中…</span>
+  <span style="margin-left:auto;color:var(--bd2)">
+    漲<span style="color:var(--up)">■</span> 跌<span style="color:var(--down)">■</span>
+  </span>
+</div>
+
+<!-- Add modal -->
+<div class="overlay" id="addOverlay">
+  <div class="modal">
+    <h3 id="addTitle">新增股票</h3>
+    <div class="field">
+      <label>顯示名稱 *</label>
+      <input type="text" id="inName" placeholder="例：台積電">
+    </div>
+    <div class="field">
+      <label>Yahoo Finance 代號 *</label>
+      <input type="text" id="inYahoo" placeholder="例：2330.TW 或 AAPL">
+      <div class="fhint">台股：代號.TW（如 2330.TW）；指數：^TWII；美股：AAPL</div>
+    </div>
+    <div class="field">
+      <label>顯示代號（選填）</label>
+      <input type="text" id="inDisplay" placeholder="留空則使用 Yahoo 代號">
+    </div>
+    <div class="mbtns">
+      <button class="btn" onclick="closeAdd()">取消</button>
+      <button class="btn btn-blue" onclick="submitAdd()">新增</button>
+    </div>
+  </div>
+</div>
+
+<!-- Reset modal -->
+<div class="overlay" id="resetOverlay">
+  <div class="modal">
+    <h3>重設清單</h3>
+    <p style="font-size:13px;color:var(--t2);margin-bottom:14px;line-height:1.6">
+      將清除所有自訂修改，恢復預設台股與美股清單。<br>
+      <span style="color:var(--up);font-size:12px">此操作無法復原。</span>
+    </p>
+    <div class="mbtns">
+      <button class="btn" onclick="closeReset()">取消</button>
+      <button class="btn btn-red" onclick="doReset()">確認重設</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+<script>
+// ── Default stock data ────────────────────────────────────────────────────────
+
+const TW_DEF = [
+  {name:'加權指數',   code:'^TWII',   yf:'^TWII'},
+  {name:'台指近',     code:'TXF',     yf:'TXFE25.TW'},
+  {name:'台積電',     code:'2330',    yf:'2330.TW'},
+  {name:'聯發科',     code:'2454',    yf:'2454.TW'},
+  {name:'台達電',     code:'2308',    yf:'2308.TW'},
+  {name:'創意',       code:'3443',    yf:'3443.TW'},
+  {name:'新代',       code:'1236',    yf:'1236.TW'},
+  {name:'達明',       code:'4138',    yf:'4138.TW'},
+  {name:'宇隆',       code:'2233',    yf:'2233.TW'},
+  {name:'日月光投控', code:'3711',    yf:'3711.TW'},
+  {name:'京元電子',   code:'2449',    yf:'2449.TW'},
+  {name:'華邦電',     code:'2344',    yf:'2344.TW'},
+  {name:'力積電',     code:'6770',    yf:'6770.TW'},
+  {name:'昇達科',     code:'3595',    yf:'3595.TW'},
+  {name:'群創',       code:'3481',    yf:'3481.TW'},
+  {name:'鴻海',       code:'2317',    yf:'2317.TW'},
+  {name:'廣達',       code:'2382',    yf:'2382.TW'},
+  {name:'瑞昱',       code:'2379',    yf:'2379.TW'},
+  {name:'和碩',       code:'4938',    yf:'4938.TW'},
+  {name:'緯創',       code:'3231',    yf:'3231.TW'},
+  {name:'華碩',       code:'2357',    yf:'2357.TW'},
+  {name:'國巨',       code:'2327',    yf:'2327.TW'},
+  {name:'大立光',     code:'3008',    yf:'3008.TW'},
+  {name:'聯亞',       code:'3081',    yf:'3081.TW'},
+  {name:'力成',       code:'6239',    yf:'6239.TW'},
+  {name:'訊芯-KY',   code:'6451',    yf:'6451.TW'},
+  {name:'元大台灣50', code:'0050',    yf:'0050.TW'},
+  {name:'永光',       code:'1711',    yf:'1711.TW'},
+  {name:'南亞科',     code:'2408',    yf:'2408.TW'},
+];
+
+const US_DEF = [
+  {name:'美國股市(昨收)', code:'S&P500',  yf:'^GSPC'},
+  {name:'美元指數(延遲)', code:'DXY',     yf:'DX-Y.NYB'},
+  {name:'美光',           code:'MU',      yf:'MU'},
+  {name:'谷歌',           code:'GOOG',    yf:'GOOG'},
+  {name:'微軟',           code:'MSFT',    yf:'MSFT'},
+  {name:'超微',           code:'AMD',     yf:'AMD'},
+  {name:'亞馬遜',         code:'AMZN',    yf:'AMZN'},
+  {name:'特斯拉',         code:'TSLA',    yf:'TSLA'},
+  {name:'輝達',           code:'NVDA',    yf:'NVDA'},
+  {name:'高通',           code:'QCOM',    yf:'QCOM'},
+  {name:'TSM',            code:'TSM.US',  yf:'TSM'},
+  {name:'NVDA',           code:'NVDA.US', yf:'NVDA'},
+  {name:'MU',             code:'MU.US',   yf:'MU'},
+  {name:'SNDK',           code:'SNDK.US', yf:'SNDK'},
+  {name:'GOOG',           code:'GOOG.US', yf:'GOOG'},
+  {name:'MSFT',           code:'MSFT.US', yf:'MSFT'},
+  {name:'PLTR',           code:'PLTR.US', yf:'PLTR'},
+  {name:'COHR',           code:'COHR.US', yf:'COHR'},
+  {name:'LITE',           code:'LITE.US', yf:'LITE'},
+  {name:'AVAV',           code:'AVAV.US', yf:'AVAV'},
+  {name:'AVGO',           code:'AVGO.US', yf:'AVGO'},
+  {name:'NET',            code:'NET.US',  yf:'NET'},
+  {name:'AMZN',           code:'AMZN.US', yf:'AMZN'},
+  {name:'ASML',           code:'ASML.US', yf:'ASML'},
+  {name:'CRWD',           code:'CRWD.US', yf:'CRWD'},
+  {name:'國際商業機器',   code:'IBM',     yf:'IBM'},
+  {name:'AMD',            code:'AMD.US',  yf:'AMD'},
+  {name:'INTC',           code:'INTC.US', yf:'INTC'},
+  {name:'QCOM',           code:'QCOM.US', yf:'QCOM'},
+  {name:'IBM',            code:'IBM.US',  yf:'IBM'},
+  {name:'ARM',            code:'ARM.US',  yf:'ARM'},
+  {name:'DDOG',           code:'DDOG.US', yf:'DDOG'},
+  {name:'MDB',            code:'MDB.US',  yf:'MDB'},
+  {name:'ORCL',           code:'ORCL.US', yf:'ORCL'},
+  {name:'CRWV',           code:'CRWV.US', yf:'CRWV'},
+  {name:'LMT',            code:'LMT.US',  yf:'LMT'},
+  {name:'NOC',            code:'NOC.US',  yf:'NOC'},
+  {name:'RTX',            code:'RTX.US',  yf:'RTX'},
+  {name:'LHX',            code:'LHX.US',  yf:'LHX'},
+  {name:'HON',            code:'HON.US',  yf:'HON'},
+  {name:'GD',             code:'GD.US',   yf:'GD'},
+  {name:'AAOI',           code:'AAOI.US', yf:'AAOI'},
+  {name:'AXTI',           code:'AXTI.US', yf:'AXTI'},
+  {name:'ONDS',           code:'ONDS.US', yf:'ONDS'},
+  {name:'RCAT',           code:'RCAT.US', yf:'RCAT'},
+  {name:'RKLB',           code:'RKLB.US', yf:'RKLB'},
+  {name:'ASTS',           code:'ASTS.US', yf:'ASTS'},
+];
+
+// ── State ─────────────────────────────────────────────────────────────────────
+
+function loadList(key, defs) {
+  try { const s = localStorage.getItem(key); if (s) return JSON.parse(s); } catch(_){}
+  return defs.map((s,i)=>({...s, id:key+'_'+i}));
+}
+let twList = loadList('tw_stocks', TW_DEF);
+let usList  = loadList('us_stocks', US_DEF);
+const cache = {};       // yfSymbol → {price,change,pct,state,priceTime,tz} | {error:true}
+let twSort = null, usSort = null;
+let refreshTimer = null;
+const REFRESH_INTERVAL = 30; // seconds when market open
+
+function save() {
+  localStorage.setItem('tw_stocks', JSON.stringify(twList));
+  localStorage.setItem('us_stocks', JSON.stringify(usList));
+}
+
+// ── Theme ─────────────────────────────────────────────────────────────────────
+
+function applyTheme(dark) {
+  document.body.classList.toggle('light', !dark);
+  document.getElementById('themeBtn').textContent = dark ? '☀' : '🌙';
+  localStorage.setItem('theme', dark ? 'dark' : 'light');
+}
+function toggleTheme() {
+  applyTheme(document.body.classList.contains('light'));
+}
+// Init theme
+applyTheme(localStorage.getItem('theme') !== 'light');
+
+// ── Market hours helper ───────────────────────────────────────────────────────
+// Returns milliseconds until next market open (0 if currently open).
+// Uses Intl.DateTimeFormat to correctly read timezone-local values.
+
+function tzInfo(timezone) {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: timezone, year:'numeric', month:'numeric', day:'numeric',
+    hour:'numeric', minute:'numeric', hour12:false
+  }).formatToParts(new Date());
+  const p = {};
+  parts.forEach(x => { p[x.type] = parseInt(x.value)||0; });
+  const h = p.hour === 24 ? 0 : p.hour;
+  return {
+    dow: new Date(p.year, p.month-1, p.day).getDay(), // 0=Sun
+    mins: h*60 + p.minute,
+  };
+}
+
+function msUntilOpen(timezone, openH, openM, closeH, closeM) {
+  const { dow, mins } = tzInfo(timezone);
+  const oMins = openH*60+openM, cMins = closeH*60+closeM;
+  if (dow>=1 && dow<=5 && mins>=oMins && mins<cMins) return 0; // open now
+
+  let wait;
+  if (dow>=1 && dow<=5 && mins<oMins) {
+    wait = (oMins - mins) * 60000;
+  } else {
+    const minsLeft = (24*60 - mins);
+    let d = 1, nd = (dow+1)%7;
+    while (nd===0||nd===6) { d++; nd=(dow+d)%7; }
+    wait = (minsLeft + (d-1)*24*60 + oMins) * 60000;
+  }
+  return wait;
+}
+
+function msUntilAnyOpen() {
+  // TW: 09:00-13:30 Asia/Taipei  |  US: 09:30-16:00 America/New_York
+  const delays = [];
+  if (twList.length) delays.push(msUntilOpen('Asia/Taipei',       9,  0, 13, 30));
+  if (usList.length) delays.push(msUntilOpen('America/New_York',  9, 30, 16,  0));
+  return delays.length ? Math.min(...delays) : 24*3600000;
+}
+
+// ── Price date formatter ──────────────────────────────────────────────────────
+
+function fmtPriceDate(unixSecs, tz) {
+  if (!unixSecs) return '';
+  const d = new Date(unixSecs * 1000);
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: tz || 'UTC',
+    month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false
+  }).formatToParts(d);
+  const p = {};
+  parts.forEach(x => p[x.type]=x.value);
+  const h = p.hour==='24'?'00':p.hour;
+  return `${p.month}/${p.day} ${h}:${p.minute}`;
+}
+
+function fmtPrice(price, sym) {
+  if (price==null) return '--';
+  if (sym.startsWith('^')||sym.includes('='))
+    return price.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  if (price<1)    return price.toFixed(4);
+  if (price<10)   return price.toFixed(3);
+  if (price<1000) return price.toFixed(2);
+  return price.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+
+// ── Rendering ─────────────────────────────────────────────────────────────────
+
+function badgeHtml(state) {
+  if (state==='REGULAR') return '<span class="mbadge open">開盤中</span>';
+  if (state==='PRE')     return '<span class="mbadge pre">盤前</span>';
+  if (state==='POST')    return '<span class="mbadge post">盤後</span>';
+  return '';
+}
+
+function makeCard(s) {
+  const el = document.createElement('div');
+  el.className = 'card'; el.dataset.id = s.id;
+
+  const db = document.createElement('button');
+  db.className='delbtn'; db.textContent='×'; db.title='刪除';
+  db.onclick = e => { e.stopPropagation(); removeStock(s.id); };
+  el.appendChild(db);
+
+  const nm = document.createElement('div'); nm.className='cname'; nm.title=s.name; nm.textContent=s.name;
+  const cd = document.createElement('div'); cd.className='ccode'; cd.textContent=s.code;
+  const pr = document.createElement('div'); pr.className='cprice loading-p'; pr.innerHTML='<span class="spinner"></span>';
+  const ch = document.createElement('div'); ch.className='cchg';
+  const ft = document.createElement('div'); ft.className='cfoot';
+  el.append(nm,cd,pr,ch,ft);
+
+  const c = cache[s.yf];
+  if (c) applyPrice(pr,ch,ft,c,s.yf);
+  return el;
+}
+
+function applyPrice(prEl, chEl, ftEl, data, sym) {
+  if (data.error) {
+    prEl.className='cprice neutral'; prEl.textContent='--';
+    chEl.className='cchg neutral'; chEl.innerHTML='<span class="errmsg">無資料</span>';
+    ftEl.innerHTML=''; return;
+  }
+  const {price,change,pct,state,priceTime,tz} = data;
+  const cls = change>0?'up':change<0?'down':'neutral';
+  const arrow = change>0?'▲':change<0?'▼':'─';
+  const sign = change>0?'+':'';
+
+  prEl.className = `cprice ${cls}`;
+  prEl.textContent = fmtPrice(price, sym);
+
+  chEl.className = `cchg ${cls}`;
+  chEl.innerHTML = `${arrow}&nbsp;${sign}${Math.abs(change).toFixed(2)}&nbsp;<span style="opacity:.7">(${sign}${pct.toFixed(2)}%)</span>`;
+
+  const timeStr = fmtPriceDate(priceTime, tz);
+  ftEl.innerHTML = (timeStr ? `<span class="ctime">${timeStr}</span>` : '') + badgeHtml(state);
+}
+
+function renderGrid(list, gid) {
+  const g = document.getElementById(gid);
+  if (gid==='twGrid'&&twSort){twSort.destroy();twSort=null}
+  if (gid==='usGrid'&&usSort){usSort.destroy();usSort=null}
+  g.innerHTML='';
+  list.forEach(s=>g.appendChild(makeCard(s)));
+  const inst = Sortable.create(g,{
+    animation:150, ghostClass:'sortable-ghost', chosenClass:'sortable-chosen',
+    delay:50, delayOnTouchOnly:true,
+    onEnd(e){
+      const arr = gid==='twGrid'?twList:usList;
+      arr.splice(e.newIndex,0,arr.splice(e.oldIndex,1)[0]);
+      save();
+    }
+  });
+  if (gid==='twGrid') twSort=inst; else usSort=inst;
+}
+
+function updatePrices(list, gid) {
+  const cards = document.getElementById(gid).querySelectorAll('.card');
+  cards.forEach((card,i)=>{
+    const s=list[i]; if(!s) return;
+    const c=cache[s.yf]; if(!c) return;
+    applyPrice(
+      card.querySelector('.cprice'),
+      card.querySelector('.cchg'),
+      card.querySelector('.cfoot'),
+      c, s.yf
+    );
+  });
+}
+
+function updateCounts() {
+  document.getElementById('twCount').textContent = twList.length+' 支';
+  document.getElementById('usCount').textContent = usList.length+' 支';
+}
+
+// ── Data fetching ─────────────────────────────────────────────────────────────
+// Yahoo Finance v8/finance/chart does NOT require a crumb token.
+// v7/finance/quote (used previously) now requires one → broke in 2024.
+
+const PROXIES = [
+  u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+  u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
+  u => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
+];
+let _bestProxy = 0;
+
+function abortAfter(ms) {
+  const c=new AbortController(), t=setTimeout(()=>c.abort(),ms);
+  return {signal:c.signal, clear:()=>clearTimeout(t)};
+}
+
+async function fetchOneYF(yfSym) {
+  const url = `https://query2.finance.yahoo.com/v8/finance/chart/` +
+    `${encodeURIComponent(yfSym)}?interval=1d&range=1d&includePrePost=false`;
+
+  const order = [...PROXIES.slice(_bestProxy), ...PROXIES.slice(0,_bestProxy)];
+  for (let i=0; i<order.length; i++) {
+    const {signal,clear} = abortAfter(9000);
+    try {
+      const res = await fetch(order[i](url), {signal});
+      clear();
+      if (!res.ok) continue;
+      const json = await res.json();
+      const meta = json?.chart?.result?.[0]?.meta;
+      if (!meta?.regularMarketPrice) continue;
+
+      const pi = PROXIES.indexOf(order[i]);
+      if (pi>=0) _bestProxy=pi;
+
+      const price = meta.regularMarketPrice;
+      const prev  = meta.chartPreviousClose ?? meta.previousClose ?? price;
+      return {
+        price, change: price-prev,
+        pct: prev ? (price-prev)/prev*100 : 0,
+        state:     meta.marketState || 'CLOSED',
+        priceTime: meta.regularMarketTime || null,
+        tz:        meta.exchangeTimezoneName || 'UTC',
+      };
+    } catch(_){ clear(); }
+  }
+  return null;
+}
+
+// ── Refresh scheduler ─────────────────────────────────────────────────────────
+
+function setStatus(dotCls, msg) {
+  document.getElementById('sdot').className = 'sdot ' + dotCls;
+  document.getElementById('stext').textContent = msg;
+}
+
+function setProgress(pct) {
+  document.getElementById('prog').style.width = pct+'%';
+}
+
+function scheduleRefresh(delayMs) {
+  clearTimeout(refreshTimer);
+  refreshTimer = setTimeout(() => refreshAll(false), delayMs);
+}
+
+async function refreshAll(manual=false) {
+  clearTimeout(refreshTimer);
+  setStatus('loading','更新資料中…');
+  setProgress(5);
+
+  const syms = [...new Set([...twList.map(s=>s.yf), ...usList.map(s=>s.yf)])];
+  let done=0;
+
+  await Promise.allSettled(syms.map(async sym => {
+    const data = await fetchOneYF(sym);
+    cache[sym] = data || {error:true};
+    done++;
+    setProgress(5 + Math.round(90*done/syms.length));
+    updatePrices(twList,'twGrid');
+    updatePrices(usList,'usGrid');
+  }));
+
+  setProgress(100);
+  setTimeout(()=>setProgress(0), 700);
+
+  const now = new Date();
+  const ok = Object.values(cache).filter(v=>!v.error).length;
+  document.getElementById('lupdate').textContent =
+    '更新：'+now.toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+
+  if (ok===0) {
+    setStatus('','⚠ 無法取得報價，請確認網路連線');
+    scheduleRefresh(60000); // retry in 1min
+    return;
+  }
+
+  // Determine if any market is currently in REGULAR session
+  const allStates = Object.values(cache).map(v=>v.state).filter(Boolean);
+  const anyOpen   = allStates.some(s=>s==='REGULAR');
+
+  if (anyOpen) {
+    setStatus('live', manual ? `手動更新完成（${ok} 支）` : `開盤中，${REFRESH_INTERVAL} 秒後更新`);
+    scheduleRefresh(REFRESH_INTERVAL * 1000);
+  } else {
+    // Determine next market open and schedule
+    const delay = msUntilAnyOpen();
+    const nextDt = new Date(Date.now()+delay);
+    const isToday = nextDt.toDateString()===now.toDateString();
+    const dateLabel = isToday ? '' :
+      (nextDt.getMonth()+1)+'/'+(nextDt.getDate())+' ';
+    const timeLabel = nextDt.toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
+
+    // Derive market label from which states we have
+    const hasPre  = allStates.some(s=>s==='PRE');
+    const hasPost = allStates.some(s=>s==='POST');
+    const stateLabel = hasPre ? '盤前' : hasPost ? '盤後' : '休市';
+
+    setStatus('', `${stateLabel}，${dateLabel}${timeLabel} 恢復更新`);
+    scheduleRefresh(delay);
+  }
+}
+
+// ── Stock management ──────────────────────────────────────────────────────────
+
+function removeStock(id) {
+  const ti=twList.findIndex(s=>s.id===id);
+  if (ti>=0){ twList.splice(ti,1); save(); renderGrid(twList,'twGrid'); updateCounts(); return; }
+  const ui=usList.findIndex(s=>s.id===id);
+  if (ui>=0){ usList.splice(ui,1); save(); renderGrid(usList,'usGrid'); updateCounts(); }
+}
+
+let _addMkt='tw';
+function openAdd(mkt) {
+  _addMkt=mkt;
+  document.getElementById('addTitle').textContent = mkt==='tw'?'新增台股':'新增美股';
+  ['inName','inYahoo','inDisplay'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('addOverlay').classList.add('show');
+  setTimeout(()=>document.getElementById('inName').focus(),40);
+}
+function closeAdd(){ document.getElementById('addOverlay').classList.remove('show'); }
+
+function submitAdd() {
+  const name    = document.getElementById('inName').value.trim();
+  const yf      = document.getElementById('inYahoo').value.trim();
+  const display = document.getElementById('inDisplay').value.trim()||yf;
+  if (!name||!yf){ alert('請填入名稱和 Yahoo Finance 代號'); return; }
+
+  const stock = {name, code:display, yf, id:_addMkt+'_'+Date.now()};
+  const list  = _addMkt==='tw'?twList:usList;
+  const gid   = _addMkt==='tw'?'twGrid':'usGrid';
+  list.push(stock); save(); renderGrid(list,gid); updateCounts(); closeAdd();
+
+  fetchOneYF(yf).then(data=>{
+    cache[yf]=data||{error:true};
+    updatePrices(list,gid);
+  });
+}
+
+function openReset()  { document.getElementById('resetOverlay').classList.add('show'); }
+function closeReset() { document.getElementById('resetOverlay').classList.remove('show'); }
+function doReset() {
+  localStorage.removeItem('tw_stocks'); localStorage.removeItem('us_stocks');
+  twList=TW_DEF.map((s,i)=>({...s,id:'tw_'+i}));
+  usList=US_DEF.map((s,i)=>({...s,id:'us_'+i}));
+  save(); renderGrid(twList,'twGrid'); renderGrid(usList,'usGrid');
+  updateCounts(); closeReset(); refreshAll(true);
+}
+
+// Overlay backdrop close
+['addOverlay','resetOverlay'].forEach(id=>{
+  document.getElementById(id).addEventListener('click',function(e){
+    if (e.target===this) this.classList.remove('show');
+  });
+});
+document.getElementById('addOverlay').addEventListener('keydown',e=>{
+  if (e.key==='Enter') submitAdd();
+  if (e.key==='Escape') closeAdd();
+});
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+
+function boot() {
+  renderGrid(twList,'twGrid');
+  renderGrid(usList,'usGrid');
+  updateCounts();
+  setStatus('loading','載入中…');
+  refreshAll(false);
+}
+boot();
+</script>
+</body>
+</html>
