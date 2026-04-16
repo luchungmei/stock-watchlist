@@ -30,9 +30,44 @@ body.light {
 body{
   background:var(--bg);color:var(--t1);
   font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,'Microsoft JhengHei',sans-serif;
-  min-height:100vh;padding-bottom:46px;
+  min-height:100vh;
   transition:background .2s,color .2s;
 }
+
+/* ── Landing page ───────────────────────────────────────────── */
+.landing-wrap{
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:40px 20px;text-align:center;
+}
+.landing-logo{font-size:36px;font-weight:800;color:var(--accent);margin-bottom:10px;letter-spacing:-1px}
+.landing-logo span{color:var(--up)}
+.landing-tagline{font-size:15px;color:var(--t2);margin-bottom:40px}
+.landing-features{
+  display:flex;gap:14px;margin-bottom:40px;
+  flex-wrap:wrap;justify-content:center;max-width:580px;
+}
+.feat{
+  display:flex;align-items:flex-start;gap:10px;
+  background:var(--bg2);border:1px solid var(--bd);
+  border-radius:10px;padding:14px 16px;width:260px;text-align:left;
+}
+.feat-icon{font-size:22px;flex-shrink:0;margin-top:1px}
+.feat-label{font-size:13px;font-weight:700;color:var(--t1);display:block;margin-bottom:3px}
+.feat-desc{font-size:12px;color:var(--t3);line-height:1.5}
+.google-signin-btn{
+  display:flex;align-items:center;gap:12px;
+  background:var(--bg2);border:1.5px solid var(--bd2);
+  color:var(--t1);padding:13px 28px;border-radius:8px;
+  font-size:15px;font-family:inherit;cursor:pointer;
+  transition:all .15s;margin-bottom:14px;
+}
+.google-signin-btn:hover{
+  background:var(--bg3);border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(96,165,250,.15);
+}
+.google-signin-btn:disabled{opacity:.55;cursor:not-allowed}
+.landing-note{font-size:11px;color:var(--t4)}
 
 /* ── Header ─────────────────────────────────────────────────── */
 header{
@@ -65,7 +100,13 @@ body.light .btn-green:hover{background:#a7f3d0;color:#064e3b}
 body.light .btn-red{background:#fee2e2;border-color:#fca5a5;color:#991b1b}
 body.light .btn-red:hover{background:#fecaca;color:#7f1d1d}
 
+/* ── User info in header ─────────────────────────────────────── */
+.user-info{display:flex;align-items:center;gap:6px;padding-left:8px;border-left:1px solid var(--bd)}
+.user-avatar{width:26px;height:26px;border-radius:50%;border:1px solid var(--bd2);display:none;object-fit:cover}
+.user-name{font-size:12px;color:var(--t2);max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
 /* ── Layout ─────────────────────────────────────────────────── */
+#appPage{padding-bottom:46px}
 main{padding:11px 11px 0;max-width:1600px;margin:0 auto}
 .section{margin-bottom:18px}
 .sec-hdr{
@@ -165,11 +206,77 @@ body.light .overlay{background:rgba(0,0,0,.4)}
 .sdot.loading{background:var(--accent);animation:pulse 1s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 body.light .sdot.live{background:#16a34a;box-shadow:0 0 5px #16a34a66}
+
+/* ── Sync indicator ─────────────────────────────────────────── */
+.sync-dot{
+  width:6px;height:6px;border-radius:50%;background:var(--bd2);flex-shrink:0;
+  transition:background .3s;
+}
+.sync-dot.syncing{background:var(--accent);animation:pulse 1s ease-in-out infinite}
+.sync-dot.synced{background:#34d399}
+.sync-dot.error{background:var(--up)}
 </style>
 </head>
 <body>
 
 <div class="pbar"><div class="pprog" id="prog"></div></div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     Landing page（未登入）
+════════════════════════════════════════════════════════════════ -->
+<div id="landingPage" style="display:none">
+  <div class="landing-wrap">
+    <div class="landing-logo">📈 股票<span>自選</span>清單</div>
+    <p class="landing-tagline">個人化股票追蹤，台股美股一覽無遺</p>
+
+    <div class="landing-features">
+      <div class="feat">
+        <div class="feat-icon">📊</div>
+        <div>
+          <span class="feat-label">即時股價</span>
+          <span class="feat-desc">台股美股同步更新，30 秒刷新一次</span>
+        </div>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">💼</div>
+        <div>
+          <span class="feat-label">個人持倉</span>
+          <span class="feat-desc">買賣記錄、未實現損益一目了然</span>
+        </div>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">☁️</div>
+        <div>
+          <span class="feat-label">雲端同步</span>
+          <span class="feat-desc">Google Sheet 儲存，跨裝置同步</span>
+        </div>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">🔒</div>
+        <div>
+          <span class="feat-label">安全私密</span>
+          <span class="feat-desc">資料存於您自己的 Google Sheet</span>
+        </div>
+      </div>
+    </div>
+
+    <button class="google-signin-btn" id="signInBtn" onclick="signIn()">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+      </svg>
+      <span id="signInText">使用 Google 帳號登入</span>
+    </button>
+    <p class="landing-note">登入即代表您同意讓本應用程式讀寫您的 Google Sheet</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     App page（已登入）
+════════════════════════════════════════════════════════════════ -->
+<div id="appPage" style="display:none">
 
 <header>
   <div class="logo">📈 股票<span>自選</span>清單</div>
@@ -180,6 +287,11 @@ body.light .sdot.live{background:#16a34a;box-shadow:0 0 5px #16a34a66}
     <button class="btn btn-green" onclick="openAdd('us')">＋ 美股</button>
     <button class="btn" id="themeBtn" onclick="toggleTheme()" title="切換深色/淡色">☀</button>
     <button class="btn" onclick="openReset()" style="font-size:11px">⚙ 重設</button>
+    <div class="user-info">
+      <img id="userAvatar" src="" alt="頭像" class="user-avatar">
+      <span id="userName" class="user-name"></span>
+      <button class="btn btn-red" onclick="signOut()" style="font-size:11px">登出</button>
+    </div>
   </div>
 </header>
 
@@ -204,7 +316,8 @@ body.light .sdot.live{background:#16a34a;box-shadow:0 0 5px #16a34a66}
 <div class="sbar">
   <div class="sdot" id="sdot"></div>
   <span id="stext">初始化中…</span>
-  <span style="margin-left:auto;color:var(--bd2)">
+  <span style="margin-left:auto;display:flex;align-items:center;gap:6px;color:var(--bd2)">
+    <div class="sync-dot" id="syncDot" title="Sheet 同步狀態"></div>
     漲<span style="color:var(--up)">■</span> 跌<span style="color:var(--down)">■</span>
   </span>
 </div>
@@ -248,8 +361,18 @@ body.light .sdot.live{background:#16a34a;box-shadow:0 0 5px #16a34a66}
   </div>
 </div>
 
+</div><!-- #appPage -->
+
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+<script src="https://accounts.google.com/gsi/client" onload="initGIS()" async defer></script>
 <script>
+// ── Constants ─────────────────────────────────────────────────────────────────
+
+const CLIENT_ID  = '91146687688-abbhlq6b141kb7em67gsuqn3nfgc0fdr.apps.googleusercontent.com';
+const SHEET_ID   = '1K3h0Tpq_LCm-f03FkGjKNfWfS7qclHEgbmT_b9chvXg';
+const SHEETS_API = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}`;
+const SCOPE      = 'https://www.googleapis.com/auth/spreadsheets openid profile email';
+
 // ── Default stock data ────────────────────────────────────────────────────────
 
 const TW_DEF = [
@@ -334,23 +457,257 @@ const US_DEF = [
   {name:'ASTS',           code:'ASTS.US', yf:'ASTS'},
 ];
 
+// ── Auth state ────────────────────────────────────────────────────────────────
+
+let tokenClient = null;
+let accessToken = sessionStorage.getItem('gAccessToken');
+let currentUser = JSON.parse(sessionStorage.getItem('gUser') || 'null');
+
+// ── GIS initialization ────────────────────────────────────────────────────────
+
+function initGIS() {
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID,
+    scope: SCOPE,
+    callback: handleTokenResponse,
+  });
+
+  if (accessToken && currentUser) {
+    showApp(currentUser);
+    loadFromSheets().catch(handleAuthError);
+  } else {
+    showLanding();
+  }
+}
+
+function signIn() {
+  setSignInLoading(true);
+  tokenClient.requestAccessToken({ prompt: 'select_account' });
+}
+
+async function handleTokenResponse(resp) {
+  if (resp.error) {
+    setSignInLoading(false);
+    alert('登入失敗：' + (resp.error_description || resp.error));
+    return;
+  }
+
+  accessToken = resp.access_token;
+  sessionStorage.setItem('gAccessToken', accessToken);
+
+  try {
+    const r = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: `Bearer ${accessToken}` }
+    });
+    if (!r.ok) throw new Error('userinfo failed');
+    const user = await r.json();
+    currentUser = { name: user.name, picture: user.picture, email: user.email };
+    sessionStorage.setItem('gUser', JSON.stringify(currentUser));
+    showApp(currentUser);
+    await loadFromSheets();
+  } catch(e) {
+    clearAuth();
+    setSignInLoading(false);
+    showLanding();
+    alert('取得使用者資訊失敗，請重試');
+  }
+}
+
+function signOut() {
+  if (accessToken) {
+    try { google.accounts.oauth2.revoke(accessToken, () => {}); } catch(_) {}
+  }
+  clearAuth();
+  twList = []; usList = [];
+  clearTimeout(refreshTimer);
+  clearTimeout(saveTimer);
+  showLanding();
+}
+
+function clearAuth() {
+  accessToken = null;
+  currentUser = null;
+  sessionStorage.removeItem('gAccessToken');
+  sessionStorage.removeItem('gUser');
+}
+
+function handleAuthError(e) {
+  if (e && e.message === 'TOKEN_EXPIRED') {
+    clearAuth();
+    showLanding();
+    alert('登入已過期，請重新登入');
+  } else {
+    console.error('Auth error:', e);
+  }
+}
+
+function setSignInLoading(loading) {
+  const btn = document.getElementById('signInBtn');
+  btn.disabled = loading;
+  document.getElementById('signInText').textContent = loading ? '登入中…' : '使用 Google 帳號登入';
+}
+
+// ── UI state ──────────────────────────────────────────────────────────────────
+
+function showLanding() {
+  document.getElementById('landingPage').style.display = '';
+  document.getElementById('appPage').style.display = 'none';
+  setSignInLoading(false);
+}
+
+function showApp(user) {
+  document.getElementById('landingPage').style.display = 'none';
+  document.getElementById('appPage').style.display = '';
+  document.getElementById('userName').textContent = user.name || user.email || '';
+  const av = document.getElementById('userAvatar');
+  if (user.picture) {
+    av.src = user.picture;
+    av.style.display = 'block';
+  }
+}
+
+// ── Sheets API helpers ────────────────────────────────────────────────────────
+
+async function sheetsRequest(url, options = {}) {
+  const headers = { Authorization: `Bearer ${accessToken}` };
+  if (options.body) headers['Content-Type'] = 'application/json';
+
+  const resp = await fetch(url, { ...options, headers });
+
+  if (resp.status === 401) throw new Error('TOKEN_EXPIRED');
+  if (!resp.ok) {
+    const txt = await resp.text().catch(() => '');
+    throw new Error(`Sheets ${resp.status}: ${txt}`);
+  }
+  // 204 No Content
+  if (resp.status === 204) return null;
+  return resp.json();
+}
+
+async function ensureSheets() {
+  const data = await sheetsRequest(`${SHEETS_API}?fields=sheets.properties.title`);
+  const existing = (data.sheets || []).map(s => s.properties.title);
+  const needed = ['watchlist', 'portfolio', 'transactions'];
+  const toCreate = needed.filter(n => !existing.includes(n));
+  if (toCreate.length === 0) return;
+
+  await sheetsRequest(`${SHEETS_API}:batchUpdate`, {
+    method: 'POST',
+    body: JSON.stringify({
+      requests: toCreate.map(title => ({ addSheet: { properties: { title } } }))
+    })
+  });
+}
+
+async function sheetsRead(range) {
+  const data = await sheetsRequest(
+    `${SHEETS_API}/values/${encodeURIComponent(range)}`
+  );
+  return data.values || [];
+}
+
+async function sheetsWrite(range, values) {
+  await sheetsRequest(
+    `${SHEETS_API}/values/${encodeURIComponent(range)}?valueInputOption=RAW`,
+    {
+      method: 'PUT',
+      body: JSON.stringify({ range, values })
+    }
+  );
+}
+
+async function sheetsClear(range) {
+  await sheetsRequest(
+    `${SHEETS_API}/values/${encodeURIComponent(range)}:clear`,
+    { method: 'POST', body: '{}' }
+  );
+}
+
+// ── Sync indicator ────────────────────────────────────────────────────────────
+
+function setSyncState(state) {
+  // state: 'syncing' | 'synced' | 'error' | ''
+  const dot = document.getElementById('syncDot');
+  if (!dot) return;
+  dot.className = 'sync-dot' + (state ? ' ' + state : '');
+  const labels = { syncing:'同步中', synced:'已同步', error:'同步失敗', '':'' };
+  dot.title = 'Sheet ' + (labels[state] || '');
+}
+
+// ── Data sync ─────────────────────────────────────────────────────────────────
+
+async function loadFromSheets() {
+  setStatus('loading', '從 Google Sheet 載入中…');
+  setSyncState('syncing');
+
+  await ensureSheets();
+  const rows = await sheetsRead('watchlist!A:D');
+
+  // If empty or only a header row → write defaults for this user
+  const isNew = rows.length <= 1 || (rows.length === 1 && rows[0][0] === 'market');
+
+  if (isNew) {
+    twList = TW_DEF.map((s, i) => ({ ...s, id: 'tw_' + i }));
+    usList = US_DEF.map((s, i) => ({ ...s, id: 'us_' + i }));
+    await saveToSheets(); // write defaults immediately (no debounce)
+  } else {
+    const data = rows[0][0] === 'market' ? rows.slice(1) : rows;
+    twList = data
+      .filter(r => r[0] === 'tw' && r[1] && r[3])
+      .map((r, i) => ({ name: r[1], code: r[2] || r[3], yf: r[3], id: 'tw_' + i }));
+    usList = data
+      .filter(r => r[0] === 'us' && r[1] && r[3])
+      .map((r, i) => ({ name: r[1], code: r[2] || r[3], yf: r[3], id: 'us_' + i }));
+  }
+
+  setSyncState('synced');
+  renderGrid(twList, 'twGrid');
+  renderGrid(usList, 'usGrid');
+  updateCounts();
+  refreshAll(false);
+}
+
+let saveTimer = null;
+
+// Debounced save — called after every list modification
+function save() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveToSheets, 1500);
+}
+
+async function saveToSheets() {
+  if (!accessToken) return;
+  setSyncState('syncing');
+  try {
+    const header = [['market', 'name', 'code', 'yf']];
+    const rows = [
+      ...twList.map(s => ['tw', s.name, s.code, s.yf]),
+      ...usList.map(s => ['us', s.name, s.code, s.yf])
+    ];
+    const all = [...header, ...rows];
+    await sheetsClear('watchlist!A:D');
+    if (all.length > 0) {
+      await sheetsWrite(`watchlist!A1:D${all.length}`, all);
+    }
+    setSyncState('synced');
+  } catch(e) {
+    setSyncState('error');
+    if (e.message === 'TOKEN_EXPIRED') {
+      handleAuthError(e);
+    } else {
+      console.error('saveToSheets error:', e);
+    }
+  }
+}
+
 // ── State ─────────────────────────────────────────────────────────────────────
 
-function loadList(key, defs) {
-  try { const s = localStorage.getItem(key); if (s) return JSON.parse(s); } catch(_){}
-  return defs.map((s,i)=>({...s, id:key+'_'+i}));
-}
-let twList = loadList('tw_stocks', TW_DEF);
-let usList  = loadList('us_stocks', US_DEF);
-const cache = {};       // yfSymbol → {price,change,pct,state,priceTime,tz} | {error:true}
+let twList = [];
+let usList  = [];
+const cache = {};
 let twSort = null, usSort = null;
 let refreshTimer = null;
-const REFRESH_INTERVAL = 30; // seconds when market open
-
-function save() {
-  localStorage.setItem('tw_stocks', JSON.stringify(twList));
-  localStorage.setItem('us_stocks', JSON.stringify(usList));
-}
+const REFRESH_INTERVAL = 30;
 
 // ── Theme ─────────────────────────────────────────────────────────────────────
 
@@ -362,12 +719,9 @@ function applyTheme(dark) {
 function toggleTheme() {
   applyTheme(document.body.classList.contains('light'));
 }
-// Init theme
 applyTheme(localStorage.getItem('theme') !== 'light');
 
 // ── Market hours helper ───────────────────────────────────────────────────────
-// Returns milliseconds until next market open (0 if currently open).
-// Uses Intl.DateTimeFormat to correctly read timezone-local values.
 
 function tzInfo(timezone) {
   const parts = new Intl.DateTimeFormat('en-US', {
@@ -378,7 +732,7 @@ function tzInfo(timezone) {
   parts.forEach(x => { p[x.type] = parseInt(x.value)||0; });
   const h = p.hour === 24 ? 0 : p.hour;
   return {
-    dow: new Date(p.year, p.month-1, p.day).getDay(), // 0=Sun
+    dow: new Date(p.year, p.month-1, p.day).getDay(),
     mins: h*60 + p.minute,
   };
 }
@@ -386,7 +740,7 @@ function tzInfo(timezone) {
 function msUntilOpen(timezone, openH, openM, closeH, closeM) {
   const { dow, mins } = tzInfo(timezone);
   const oMins = openH*60+openM, cMins = closeH*60+closeM;
-  if (dow>=1 && dow<=5 && mins>=oMins && mins<cMins) return 0; // open now
+  if (dow>=1 && dow<=5 && mins>=oMins && mins<cMins) return 0;
 
   let wait;
   if (dow>=1 && dow<=5 && mins<oMins) {
@@ -401,7 +755,6 @@ function msUntilOpen(timezone, openH, openM, closeH, closeM) {
 }
 
 function msUntilAnyOpen() {
-  // TW: 09:00-13:30 Asia/Taipei  |  US: 09:30-16:00 America/New_York
   const delays = [];
   if (twList.length) delays.push(msUntilOpen('Asia/Taipei',       9,  0, 13, 30));
   if (usList.length) delays.push(msUntilOpen('America/New_York',  9, 30, 16,  0));
@@ -522,8 +875,6 @@ function updateCounts() {
 }
 
 // ── Data fetching ─────────────────────────────────────────────────────────────
-// Yahoo Finance v8/finance/chart does NOT require a crumb token.
-// v7/finance/quote (used previously) now requires one → broke in 2024.
 
 const PROXIES = [
   u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
@@ -612,11 +963,10 @@ async function refreshAll(manual=false) {
 
   if (ok===0) {
     setStatus('','⚠ 無法取得報價，請確認網路連線');
-    scheduleRefresh(60000); // retry in 1min
+    scheduleRefresh(60000);
     return;
   }
 
-  // Determine if any market is currently in REGULAR session
   const allStates = Object.values(cache).map(v=>v.state).filter(Boolean);
   const anyOpen   = allStates.some(s=>s==='REGULAR');
 
@@ -624,19 +974,15 @@ async function refreshAll(manual=false) {
     setStatus('live', manual ? `手動更新完成（${ok} 支）` : `開盤中，${REFRESH_INTERVAL} 秒後更新`);
     scheduleRefresh(REFRESH_INTERVAL * 1000);
   } else {
-    // Determine next market open and schedule
     const delay = msUntilAnyOpen();
     const nextDt = new Date(Date.now()+delay);
     const isToday = nextDt.toDateString()===now.toDateString();
     const dateLabel = isToday ? '' :
       (nextDt.getMonth()+1)+'/'+(nextDt.getDate())+' ';
     const timeLabel = nextDt.toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
-
-    // Derive market label from which states we have
     const hasPre  = allStates.some(s=>s==='PRE');
     const hasPost = allStates.some(s=>s==='POST');
     const stateLabel = hasPre ? '盤前' : hasPost ? '盤後' : '休市';
-
     setStatus('', `${stateLabel}，${dateLabel}${timeLabel} 恢復更新`);
     scheduleRefresh(delay);
   }
@@ -681,10 +1027,10 @@ function submitAdd() {
 function openReset()  { document.getElementById('resetOverlay').classList.add('show'); }
 function closeReset() { document.getElementById('resetOverlay').classList.remove('show'); }
 function doReset() {
-  localStorage.removeItem('tw_stocks'); localStorage.removeItem('us_stocks');
   twList=TW_DEF.map((s,i)=>({...s,id:'tw_'+i}));
   usList=US_DEF.map((s,i)=>({...s,id:'us_'+i}));
-  save(); renderGrid(twList,'twGrid'); renderGrid(usList,'usGrid');
+  saveToSheets(); // immediate write (no debounce for reset)
+  renderGrid(twList,'twGrid'); renderGrid(usList,'usGrid');
   updateCounts(); closeReset(); refreshAll(true);
 }
 
@@ -700,15 +1046,13 @@ document.getElementById('addOverlay').addEventListener('keydown',e=>{
 });
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
-
-function boot() {
-  renderGrid(twList,'twGrid');
-  renderGrid(usList,'usGrid');
-  updateCounts();
-  setStatus('loading','載入中…');
-  refreshAll(false);
-}
-boot();
+// GIS onload callback (initGIS) handles routing to landing or app page.
+// If GIS script fails to load, show landing as fallback.
+window.addEventListener('error', e => {
+  if (e.filename && e.filename.includes('accounts.google.com')) {
+    showLanding();
+  }
+}, true);
 </script>
 </body>
 </html>
