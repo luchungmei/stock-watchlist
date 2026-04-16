@@ -49,3 +49,20 @@
 - 保持程式碼在單一 index.html 檔案
 - 每次修改後提醒我執行 git push 更新 GitHub
 - 安全性優先，Google OAuth 只申請最小必要權限
+
+## 介面規範
+- 整體風格：Apple 淺灰科技感
+- 整體背景：#F5F5F7
+- 頁首背景：#FFFFFF，底部加 1px 細線 #D2D2D7
+- 股票卡片：白色背景 #FFFFFF，無陰影，無邊框
+- 台股區塊底色：#F0F4FF（淡藍灰）
+- 美股區塊底色：#F0F7F0（淡綠灰）
+- 股票名稱：#1D1D1F，16px
+- 股票代號：#6E6E73，12px
+- 股價：22px
+- 漲跌幅：14px
+- 上漲：#FF3B30
+- 下跌：#34C759
+- 無變化：#6E6E73
+- 按鈕：#0071E3
+- 字型：-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif
