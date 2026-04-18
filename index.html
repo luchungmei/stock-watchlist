@@ -5,215 +5,202 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>股票自選清單</title>
 <style>
-/* ── Theme variables ───────────────────────────────────────── */
+/* ── Apple 淺灰科技感 ─────────────────────────────────────────── */
 :root {
-  --bg:    #0a0e14; --bg2:   #111827; --bg3:   #1c2333;
-  --bd:    #1f2937; --bd2:   #374151;
-  --t1:    #e5e7eb; --t2:    #9ca3af; --t3:    #6b7280; --t4:    #4b5563;
-  --accent:#60a5fa; --up:#f87171; --down:#34d399;
-  --badge-open-bg:rgba(52,211,153,.15);  --badge-open-fg:#34d399;
-  --badge-pre-bg:rgba(96,165,250,.15);   --badge-pre-fg:#93c5fd;
-  --badge-post-bg:rgba(251,191,36,.15);  --badge-post-fg:#fbbf24;
-}
-body.light {
-  --bg:    #f1f5f9; --bg2:   #ffffff; --bg3:   #f8fafc;
-  --bd:    #e2e8f0; --bd2:   #cbd5e1;
-  --t1:    #1e293b; --t2:    #475569; --t3:    #64748b; --t4:    #94a3b8;
-  --accent:#2563eb; --up:#dc2626; --down:#16a34a;
-  --badge-open-bg:rgba(22,163,74,.12);   --badge-open-fg:#15803d;
-  --badge-pre-bg:rgba(37,99,235,.12);    --badge-pre-fg:#2563eb;
-  --badge-post-bg:rgba(217,119,6,.15);   --badge-post-fg:#b45309;
+  --bg:        #F5F5F7;
+  --bg-card:   #FFFFFF;
+  --bg-header: #FFFFFF;
+  --bg-tw:     #F0F4FF;
+  --bg-us:     #F0F7F0;
+  --border:    #D2D2D7;
+  --border2:   #C7C7CC;
+  --text1:     #1D1D1F;
+  --text2:     #6E6E73;
+  --text3:     #6E6E73;
+  --text4:     #AEAEB2;
+  --accent:    #0071E3;
+  --up:        #FF3B30;
+  --down:      #34C759;
+  --neutral:   #6E6E73;
 }
 
-/* ── Reset & base ───────────────────────────────────────────── */
 *{margin:0;padding:0;box-sizing:border-box}
 body{
-  background:var(--bg);color:var(--t1);
-  font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,'Microsoft JhengHei',sans-serif;
+  background:var(--bg);color:var(--text1);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;
   min-height:100vh;
-  transition:background .2s,color .2s;
 }
 
-/* ── Landing page ───────────────────────────────────────────── */
+/* ── Landing ────────────────────────────────────────────────── */
 .landing-wrap{
   min-height:100vh;display:flex;flex-direction:column;
   align-items:center;justify-content:center;
   padding:40px 20px;text-align:center;
 }
-.landing-logo{font-size:36px;font-weight:800;color:var(--accent);margin-bottom:10px;letter-spacing:-1px}
-.landing-logo span{color:var(--up)}
-.landing-tagline{font-size:15px;color:var(--t2);margin-bottom:40px}
+.landing-logo{font-size:34px;font-weight:700;color:var(--text1);margin-bottom:8px;letter-spacing:-0.5px}
+.landing-logo span{color:var(--accent)}
+.landing-tagline{font-size:15px;color:var(--text2);margin-bottom:40px}
 .landing-features{
-  display:flex;gap:14px;margin-bottom:40px;
+  display:flex;gap:12px;margin-bottom:40px;
   flex-wrap:wrap;justify-content:center;max-width:580px;
 }
 .feat{
   display:flex;align-items:flex-start;gap:10px;
-  background:var(--bg2);border:1px solid var(--bd);
-  border-radius:10px;padding:14px 16px;width:260px;text-align:left;
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:12px;padding:14px 16px;width:260px;text-align:left;
 }
 .feat-icon{font-size:22px;flex-shrink:0;margin-top:1px}
-.feat-label{font-size:13px;font-weight:700;color:var(--t1);display:block;margin-bottom:3px}
-.feat-desc{font-size:12px;color:var(--t3);line-height:1.5}
+.feat-label{font-size:13px;font-weight:600;color:var(--text1);display:block;margin-bottom:3px}
+.feat-desc{font-size:12px;color:var(--text2);line-height:1.5}
 .google-signin-btn{
   display:flex;align-items:center;gap:12px;
-  background:var(--bg2);border:1.5px solid var(--bd2);
-  color:var(--t1);padding:13px 28px;border-radius:8px;
-  font-size:15px;font-family:inherit;cursor:pointer;
-  transition:all .15s;margin-bottom:14px;
+  background:var(--accent);border:none;
+  color:#fff;padding:13px 28px;border-radius:980px;
+  font-size:15px;font-family:inherit;font-weight:500;cursor:pointer;
+  transition:opacity .15s;margin-bottom:14px;
 }
-.google-signin-btn:hover{
-  background:var(--bg3);border-color:var(--accent);
-  box-shadow:0 0 0 3px rgba(96,165,250,.15);
-}
+.google-signin-btn:hover{opacity:.85}
 .google-signin-btn:disabled{opacity:.55;cursor:not-allowed}
-.landing-note{font-size:11px;color:var(--t4)}
+.landing-note{font-size:11px;color:var(--text4)}
 
 /* ── Header ─────────────────────────────────────────────────── */
 header{
-  background:var(--bg2);border-bottom:1px solid var(--bd);
-  padding:9px 14px;display:flex;align-items:center;
+  background:var(--bg-header);border-bottom:1px solid var(--border);
+  padding:10px 16px;display:flex;align-items:center;
   justify-content:space-between;position:sticky;top:0;z-index:100;
   gap:8px;flex-wrap:wrap;
 }
-.logo{font-size:15px;font-weight:700;color:var(--accent);white-space:nowrap}
-.logo span{color:var(--up)}
-.hright{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
-.lupdate{font-size:11px;color:var(--t3);white-space:nowrap}
+.logo{font-size:16px;font-weight:700;color:var(--text1);white-space:nowrap}
+.logo span{color:var(--accent)}
+.hright{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.lupdate{font-size:11px;color:var(--text3);white-space:nowrap}
 
 .btn{
-  background:var(--bg3);border:1px solid var(--bd2);color:var(--t2);
-  padding:5px 9px;border-radius:5px;cursor:pointer;font-size:12px;
-  white-space:nowrap;transition:all .15s;font-family:inherit;
+  background:var(--bg-card);border:1px solid var(--border);color:var(--text2);
+  padding:6px 12px;border-radius:980px;cursor:pointer;font-size:12px;
+  white-space:nowrap;transition:all .15s;font-family:inherit;font-weight:500;
 }
-.btn:hover{background:var(--bd);color:var(--t1)}
-.btn-blue{background:#1d4ed8;border-color:#2563eb;color:#bfdbfe}
-.btn-blue:hover{background:#2563eb;color:#fff}
-.btn-green{background:#065f46;border-color:#059669;color:#6ee7b7}
-.btn-green:hover{background:#059669;color:#fff}
-.btn-red{background:#7f1d1d;border-color:#dc2626;color:#fca5a5}
-.btn-red:hover{background:#dc2626;color:#fff}
-body.light .btn-blue{background:#dbeafe;border-color:#93c5fd;color:#1d4ed8}
-body.light .btn-blue:hover{background:#bfdbfe;color:#1e40af}
-body.light .btn-green{background:#d1fae5;border-color:#6ee7b7;color:#065f46}
-body.light .btn-green:hover{background:#a7f3d0;color:#064e3b}
-body.light .btn-red{background:#fee2e2;border-color:#fca5a5;color:#991b1b}
-body.light .btn-red:hover{background:#fecaca;color:#7f1d1d}
+.btn:hover{background:var(--bg);border-color:var(--border2);color:var(--text1)}
+.btn-blue{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-blue:hover{background:#0077ED;border-color:#0077ED;color:#fff}
+.btn-green{background:#34C759;border-color:#34C759;color:#fff}
+.btn-green:hover{background:#2DB14E;border-color:#2DB14E;color:#fff}
+.btn-red{background:#FF3B30;border-color:#FF3B30;color:#fff}
+.btn-red:hover{background:#E0342B;border-color:#E0342B;color:#fff}
 
-/* ── User info in header ─────────────────────────────────────── */
-.user-info{display:flex;align-items:center;gap:6px;padding-left:8px;border-left:1px solid var(--bd)}
-.user-avatar{width:26px;height:26px;border-radius:50%;border:1px solid var(--bd2);display:none;object-fit:cover}
-.user-name{font-size:12px;color:var(--t2);max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* ── User info ───────────────────────────────────────────────── */
+.user-info{display:flex;align-items:center;gap:6px;padding-left:10px;border-left:1px solid var(--border)}
+.user-avatar{width:26px;height:26px;border-radius:50%;border:1px solid var(--border);display:none;object-fit:cover}
+.user-name{font-size:12px;color:var(--text2);max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 /* ── Layout ─────────────────────────────────────────────────── */
 #appPage{padding-bottom:46px}
-main{padding:11px 11px 0;max-width:1600px;margin:0 auto}
-.section{margin-bottom:18px}
+main{padding:14px 14px 0;max-width:1600px;margin:0 auto}
+.section{margin-bottom:20px}
 .sec-hdr{
   display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:7px;padding:5px 10px;background:var(--bg2);
-  border-radius:6px;border-left:3px solid var(--accent);
+  margin-bottom:8px;padding:9px 14px;border-radius:10px;
 }
-.sec-title{font-size:13px;font-weight:700;color:var(--t1);display:flex;align-items:center;gap:5px}
-.sec-meta{font-size:11px;color:var(--t3);display:flex;align-items:center;gap:7px}
+.sec-hdr.tw-hdr{background:var(--bg-tw)}
+.sec-hdr.us-hdr{background:var(--bg-us)}
+.sec-title{font-size:13px;font-weight:600;color:var(--text1);display:flex;align-items:center;gap:5px}
+.sec-meta{font-size:11px;color:var(--text2);display:flex;align-items:center;gap:6px}
 
 /* ── Grid ───────────────────────────────────────────────────── */
 .grid{
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(152px,1fr));gap:5px;min-height:10px;
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:6px;min-height:10px;
 }
 @media(max-width:420px){.grid{grid-template-columns:repeat(2,1fr)}}
-@media(min-width:900px){.grid{grid-template-columns:repeat(auto-fill,minmax(165px,1fr))}}
-@media(min-width:1400px){.grid{grid-template-columns:repeat(auto-fill,minmax(175px,1fr))}}
+@media(min-width:900px){.grid{grid-template-columns:repeat(auto-fill,minmax(168px,1fr))}}
+@media(min-width:1400px){.grid{grid-template-columns:repeat(auto-fill,minmax(178px,1fr))}}
 
 /* ── Card ───────────────────────────────────────────────────── */
 .card{
-  background:var(--bg2);border:1px solid var(--bd);border-radius:6px;
-  padding:9px 10px 7px;cursor:grab;position:relative;user-select:none;
-  min-height:88px;transition:border-color .15s,background .15s;
+  background:var(--bg-card);border-radius:10px;
+  padding:12px 12px 9px;cursor:grab;position:relative;user-select:none;
+  min-height:90px;transition:background .15s;
 }
-.card:hover{border-color:var(--bd2);background:var(--bg3)}
+.card:hover{background:#FAFAFA}
 .card:active{cursor:grabbing}
-.card.sortable-ghost{opacity:.2;background:var(--bg3)}
-.card.sortable-chosen{box-shadow:0 4px 18px rgba(0,0,0,.45);z-index:10;cursor:grabbing}
-body.light .card.sortable-chosen{box-shadow:0 4px 18px rgba(0,0,0,.15)}
+.card.sortable-ghost{opacity:.2}
+.card.sortable-chosen{box-shadow:0 4px 20px rgba(0,0,0,.12);z-index:10;cursor:grabbing}
 
-.cname{font-size:11px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:1px;padding-right:18px}
-.ccode{font-size:10px;color:var(--t4);margin-bottom:5px}
-.cprice{font-size:17px;font-weight:700;font-family:'Courier New','Consolas',monospace;letter-spacing:.4px;margin-bottom:3px;line-height:1.1}
-.cchg{font-size:11px;display:flex;gap:3px;align-items:center;flex-wrap:wrap;margin-bottom:4px}
+.cname{font-size:16px;font-weight:500;color:var(--text1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px;padding-right:20px}
+.ccode{font-size:12px;color:var(--text2);margin-bottom:6px}
+.cprice{font-size:22px;font-weight:600;letter-spacing:-0.5px;margin-bottom:3px;line-height:1.1}
+.cchg{font-size:14px;display:flex;gap:3px;align-items:center;flex-wrap:wrap;margin-bottom:4px}
 .cfoot{display:flex;align-items:center;gap:5px;min-height:14px}
-.ctime{font-size:9px;color:var(--t4)}
-.mbadge{font-size:9px;padding:1px 4px;border-radius:3px;font-weight:600;line-height:1.4}
-.mbadge.open{background:var(--badge-open-bg);color:var(--badge-open-fg)}
-.mbadge.pre {background:var(--badge-pre-bg); color:var(--badge-pre-fg)}
-.mbadge.post{background:var(--badge-post-bg);color:var(--badge-post-fg)}
+.ctime{font-size:9px;color:var(--text4)}
+.mbadge{font-size:9px;padding:2px 5px;border-radius:4px;font-weight:600;line-height:1.4}
+.mbadge.open{background:rgba(52,199,89,.15);color:#1A7F37}
+.mbadge.pre {background:rgba(0,113,227,.12);color:#0071E3}
+.mbadge.post{background:rgba(255,149,0,.15);color:#B25000}
 
-.up{color:var(--up)} .down{color:var(--down)} .neutral{color:var(--t3)}
-.loading-p{color:var(--t4);font-size:14px}
-.errmsg{color:var(--t4);font-size:10px;font-style:italic}
+.up{color:var(--up)} .down{color:var(--down)} .neutral{color:var(--neutral)}
+.loading-p{color:var(--text4);font-size:14px}
+.errmsg{color:var(--text4);font-size:10px;font-style:italic}
 
 .delbtn{
-  position:absolute;top:5px;right:5px;background:none;border:none;
-  color:var(--t4);cursor:pointer;font-size:14px;line-height:1;padding:1px 3px;
-  border-radius:3px;transition:all .15s;display:none;
+  position:absolute;top:8px;right:8px;background:none;border:none;
+  color:var(--text4);cursor:pointer;font-size:16px;line-height:1;padding:1px 4px;
+  border-radius:4px;transition:all .15s;display:none;
 }
 .card:hover .delbtn{display:block}
-.delbtn:hover{color:var(--up);background:rgba(248,113,113,.12)}
-body.light .delbtn:hover{background:rgba(220,38,38,.1)}
+.delbtn:hover{color:var(--up);background:rgba(255,59,48,.1)}
 
 @keyframes spin{to{transform:rotate(360deg)}}
 .spinner{
-  display:inline-block;width:10px;height:10px;
-  border:2px solid var(--bd2);border-top-color:var(--accent);
+  display:inline-block;width:11px;height:11px;
+  border:2px solid var(--border);border-top-color:var(--accent);
   border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;
 }
 
 /* ── Progress bar ───────────────────────────────────────────── */
-.pbar{height:2px;background:var(--bd);position:fixed;top:0;left:0;right:0;z-index:200}
+.pbar{height:2px;background:transparent;position:fixed;top:0;left:0;right:0;z-index:200}
 .pprog{height:100%;background:var(--accent);width:0%;transition:width .3s}
 
 /* ── Modal ──────────────────────────────────────────────────── */
 .overlay{
-  display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);
   z-index:500;align-items:center;justify-content:center;padding:14px;
 }
-body.light .overlay{background:rgba(0,0,0,.4)}
 .overlay.show{display:flex}
 .modal{
-  background:var(--bg2);border:1px solid var(--bd2);border-radius:10px;
-  padding:20px;width:100%;max-width:360px;
+  background:var(--bg-card);border-radius:16px;
+  padding:24px;width:100%;max-width:360px;
+  box-shadow:0 20px 60px rgba(0,0,0,.15);
 }
-.modal h3{color:var(--t1);font-size:15px;margin-bottom:14px}
-.field{margin-bottom:10px}
-.field label{display:block;font-size:11px;color:var(--t2);margin-bottom:3px}
+.modal h3{color:var(--text1);font-size:17px;font-weight:600;margin-bottom:16px}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:12px;font-weight:500;color:var(--text2);margin-bottom:4px}
 .field input{
-  width:100%;background:var(--bg);border:1px solid var(--bd2);color:var(--t1);
-  padding:7px 10px;border-radius:5px;font-size:13px;font-family:inherit;
+  width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text1);
+  padding:8px 12px;border-radius:8px;font-size:14px;font-family:inherit;
+  transition:border-color .15s;
 }
-.field input:focus{outline:none;border-color:var(--accent)}
-.fhint{font-size:10px;color:var(--t3);margin-top:3px}
-.mbtns{display:flex;gap:6px;justify-content:flex-end;margin-top:14px}
+.field input:focus{outline:none;border-color:var(--accent);background:#fff}
+.fhint{font-size:10px;color:var(--text3);margin-top:3px}
+.mbtns{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
 
 /* ── Status bar ─────────────────────────────────────────────── */
 .sbar{
-  background:var(--bg2);border-top:1px solid var(--bd);
-  padding:5px 14px;font-size:10px;color:var(--t4);
+  background:var(--bg-header);border-top:1px solid var(--border);
+  padding:6px 16px;font-size:10px;color:var(--text3);
   position:fixed;bottom:0;left:0;right:0;
   display:flex;gap:10px;align-items:center;
 }
-.sdot{width:6px;height:6px;border-radius:50%;background:var(--bd2);flex-shrink:0}
-.sdot.live{background:#34d399;box-shadow:0 0 5px #34d39977}
+.sdot{width:6px;height:6px;border-radius:50%;background:var(--border2);flex-shrink:0}
+.sdot.live{background:#34C759;box-shadow:0 0 5px rgba(52,199,89,.5)}
 .sdot.loading{background:var(--accent);animation:pulse 1s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
-body.light .sdot.live{background:#16a34a;box-shadow:0 0 5px #16a34a66}
 
 /* ── Sync indicator ─────────────────────────────────────────── */
 .sync-dot{
-  width:6px;height:6px;border-radius:50%;background:var(--bd2);flex-shrink:0;
+  width:6px;height:6px;border-radius:50%;background:var(--border2);flex-shrink:0;
   transition:background .3s;
 }
 .sync-dot.syncing{background:var(--accent);animation:pulse 1s ease-in-out infinite}
-.sync-dot.synced{background:#34d399}
+.sync-dot.synced{background:#34C759}
 .sync-dot.error{background:var(--up)}
 </style>
 </head>
@@ -222,7 +209,7 @@ body.light .sdot.live{background:#16a34a;box-shadow:0 0 5px #16a34a66}
 <div class="pbar"><div class="pprog" id="prog"></div></div>
 
 <!-- ══════════════════════════════════════════════════════════════
-     Landing page（未登入）
+     Landing（未登入）
 ════════════════════════════════════════════════════════════════ -->
 <div id="landingPage" style="display:none">
   <div class="landing-wrap">
@@ -255,26 +242,26 @@ body.light .sdot.live{background:#16a34a;box-shadow:0 0 5px #16a34a66}
         <div class="feat-icon">🔒</div>
         <div>
           <span class="feat-label">安全私密</span>
-          <span class="feat-desc">資料存於您自己的 Google Sheet</span>
+          <span class="feat-desc">資料存於您自己的 Google Drive</span>
         </div>
       </div>
     </div>
 
     <button class="google-signin-btn" id="signInBtn" onclick="signIn()">
       <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+        <path fill="#fff" opacity=".9" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+        <path fill="#fff" opacity=".9" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+        <path fill="#fff" opacity=".9" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+        <path fill="#fff" opacity=".9" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
       </svg>
       <span id="signInText">使用 Google 帳號登入</span>
     </button>
-    <p class="landing-note">登入即代表您同意讓本應用程式讀寫您的 Google Sheet</p>
+    <p class="landing-note">登入即代表您同意讓本應用程式讀寫您 Google Drive 中的 stock-watchlist-db</p>
   </div>
 </div>
 
 <!-- ══════════════════════════════════════════════════════════════
-     App page（已登入）
+     App（已登入）
 ════════════════════════════════════════════════════════════════ -->
 <div id="appPage" style="display:none">
 
@@ -285,7 +272,6 @@ body.light .sdot.live{background:#16a34a;box-shadow:0 0 5px #16a34a66}
     <button class="btn" onclick="refreshAll(true)">↻ 更新</button>
     <button class="btn btn-blue" onclick="openAdd('tw')">＋ 台股</button>
     <button class="btn btn-green" onclick="openAdd('us')">＋ 美股</button>
-    <button class="btn" id="themeBtn" onclick="toggleTheme()" title="切換深色/淡色">☀</button>
     <button class="btn" onclick="openReset()" style="font-size:11px">⚙ 重設</button>
     <div class="user-info">
       <img id="userAvatar" src="" alt="頭像" class="user-avatar">
@@ -297,16 +283,16 @@ body.light .sdot.live{background:#16a34a;box-shadow:0 0 5px #16a34a66}
 
 <main>
   <div class="section">
-    <div class="sec-hdr">
+    <div class="sec-hdr tw-hdr">
       <div class="sec-title">🇹🇼 台股</div>
-      <div class="sec-meta"><span id="twCount"></span><span style="color:var(--bd2)">｜</span><span>↕ 拖拉排序</span></div>
+      <div class="sec-meta"><span id="twCount"></span><span style="color:var(--border2)">｜</span><span>↕ 拖拉排序</span></div>
     </div>
     <div class="grid" id="twGrid"></div>
   </div>
   <div class="section">
-    <div class="sec-hdr" style="border-left-color:#10b981">
+    <div class="sec-hdr us-hdr">
       <div class="sec-title">🇺🇸 美股</div>
-      <div class="sec-meta"><span id="usCount"></span><span style="color:var(--bd2)">｜</span><span>↕ 拖拉排序</span></div>
+      <div class="sec-meta"><span id="usCount"></span><span style="color:var(--border2)">｜</span><span>↕ 拖拉排序</span></div>
     </div>
     <div class="grid" id="usGrid"></div>
   </div>
@@ -316,13 +302,13 @@ body.light .sdot.live{background:#16a34a;box-shadow:0 0 5px #16a34a66}
 <div class="sbar">
   <div class="sdot" id="sdot"></div>
   <span id="stext">初始化中…</span>
-  <span style="margin-left:auto;display:flex;align-items:center;gap:6px;color:var(--bd2)">
+  <span style="margin-left:auto;display:flex;align-items:center;gap:6px;color:var(--text4)">
     <div class="sync-dot" id="syncDot" title="Sheet 同步狀態"></div>
     漲<span style="color:var(--up)">■</span> 跌<span style="color:var(--down)">■</span>
   </span>
 </div>
 
-<!-- Add modal -->
+<!-- 新增股票 modal -->
 <div class="overlay" id="addOverlay">
   <div class="modal">
     <h3 id="addTitle">新增股票</h3>
@@ -346,11 +332,11 @@ body.light .sdot.live{background:#16a34a;box-shadow:0 0 5px #16a34a66}
   </div>
 </div>
 
-<!-- Reset modal -->
+<!-- 重設 modal -->
 <div class="overlay" id="resetOverlay">
   <div class="modal">
     <h3>重設清單</h3>
-    <p style="font-size:13px;color:var(--t2);margin-bottom:14px;line-height:1.6">
+    <p style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6">
       將清除所有自訂修改，恢復預設台股與美股清單。<br>
       <span style="color:var(--up);font-size:12px">此操作無法復原。</span>
     </p>
@@ -368,100 +354,34 @@ body.light .sdot.live{background:#16a34a;box-shadow:0 0 5px #16a34a66}
 <script>
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const CLIENT_ID  = '91146687688-abbhlq6b141kb7em67gsuqn3nfgc0fdr.apps.googleusercontent.com';
-const SHEET_ID   = '1K3h0Tpq_LCm-f03FkGjKNfWfS7qclHEgbmT_b9chvXg';
-const SHEETS_API = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}`;
-const SCOPE      = 'https://www.googleapis.com/auth/spreadsheets openid profile email';
+const CLIENT_ID = '91146687688-abbhlq6b141kb7em67gsuqn3nfgc0fdr.apps.googleusercontent.com';
+const SCOPE     = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file openid profile email';
+const SHEET_NAME = 'stock-watchlist-db';
 
-// ── Default stock data ────────────────────────────────────────────────────────
+// ── Default stock lists ───────────────────────────────────────────────────────
 
 const TW_DEF = [
-  {name:'加權指數',   code:'^TWII',   yf:'^TWII'},
-  {name:'台指近',     code:'TXF',     yf:'TXFE25.TW'},
-  {name:'台積電',     code:'2330',    yf:'2330.TW'},
-  {name:'聯發科',     code:'2454',    yf:'2454.TW'},
-  {name:'台達電',     code:'2308',    yf:'2308.TW'},
-  {name:'創意',       code:'3443',    yf:'3443.TW'},
-  {name:'新代',       code:'1236',    yf:'1236.TW'},
-  {name:'達明',       code:'4138',    yf:'4138.TW'},
-  {name:'宇隆',       code:'2233',    yf:'2233.TW'},
-  {name:'日月光投控', code:'3711',    yf:'3711.TW'},
-  {name:'京元電子',   code:'2449',    yf:'2449.TW'},
-  {name:'華邦電',     code:'2344',    yf:'2344.TW'},
-  {name:'力積電',     code:'6770',    yf:'6770.TW'},
-  {name:'昇達科',     code:'3595',    yf:'3595.TW'},
-  {name:'群創',       code:'3481',    yf:'3481.TW'},
-  {name:'鴻海',       code:'2317',    yf:'2317.TW'},
-  {name:'廣達',       code:'2382',    yf:'2382.TW'},
-  {name:'瑞昱',       code:'2379',    yf:'2379.TW'},
-  {name:'和碩',       code:'4938',    yf:'4938.TW'},
-  {name:'緯創',       code:'3231',    yf:'3231.TW'},
-  {name:'華碩',       code:'2357',    yf:'2357.TW'},
-  {name:'國巨',       code:'2327',    yf:'2327.TW'},
-  {name:'大立光',     code:'3008',    yf:'3008.TW'},
-  {name:'聯亞',       code:'3081',    yf:'3081.TW'},
-  {name:'力成',       code:'6239',    yf:'6239.TW'},
-  {name:'訊芯-KY',   code:'6451',    yf:'6451.TW'},
-  {name:'元大台灣50', code:'0050',    yf:'0050.TW'},
-  {name:'永光',       code:'1711',    yf:'1711.TW'},
-  {name:'南亞科',     code:'2408',    yf:'2408.TW'},
+  {name:'台積電', code:'2330', yf:'2330.TW'},
+  {name:'聯發科', code:'2454', yf:'2454.TW'},
+  {name:'台達電', code:'2308', yf:'2308.TW'},
 ];
 
 const US_DEF = [
-  {name:'美國股市(昨收)', code:'S&P500',  yf:'^GSPC'},
-  {name:'美元指數(延遲)', code:'DXY',     yf:'DX-Y.NYB'},
-  {name:'美光',           code:'MU',      yf:'MU'},
-  {name:'谷歌',           code:'GOOG',    yf:'GOOG'},
-  {name:'微軟',           code:'MSFT',    yf:'MSFT'},
-  {name:'超微',           code:'AMD',     yf:'AMD'},
-  {name:'亞馬遜',         code:'AMZN',    yf:'AMZN'},
-  {name:'特斯拉',         code:'TSLA',    yf:'TSLA'},
-  {name:'輝達',           code:'NVDA',    yf:'NVDA'},
-  {name:'高通',           code:'QCOM',    yf:'QCOM'},
-  {name:'TSM',            code:'TSM.US',  yf:'TSM'},
-  {name:'NVDA',           code:'NVDA.US', yf:'NVDA'},
-  {name:'MU',             code:'MU.US',   yf:'MU'},
-  {name:'SNDK',           code:'SNDK.US', yf:'SNDK'},
-  {name:'GOOG',           code:'GOOG.US', yf:'GOOG'},
-  {name:'MSFT',           code:'MSFT.US', yf:'MSFT'},
-  {name:'PLTR',           code:'PLTR.US', yf:'PLTR'},
-  {name:'COHR',           code:'COHR.US', yf:'COHR'},
-  {name:'LITE',           code:'LITE.US', yf:'LITE'},
-  {name:'AVAV',           code:'AVAV.US', yf:'AVAV'},
-  {name:'AVGO',           code:'AVGO.US', yf:'AVGO'},
-  {name:'NET',            code:'NET.US',  yf:'NET'},
-  {name:'AMZN',           code:'AMZN.US', yf:'AMZN'},
-  {name:'ASML',           code:'ASML.US', yf:'ASML'},
-  {name:'CRWD',           code:'CRWD.US', yf:'CRWD'},
-  {name:'國際商業機器',   code:'IBM',     yf:'IBM'},
-  {name:'AMD',            code:'AMD.US',  yf:'AMD'},
-  {name:'INTC',           code:'INTC.US', yf:'INTC'},
-  {name:'QCOM',           code:'QCOM.US', yf:'QCOM'},
-  {name:'IBM',            code:'IBM.US',  yf:'IBM'},
-  {name:'ARM',            code:'ARM.US',  yf:'ARM'},
-  {name:'DDOG',           code:'DDOG.US', yf:'DDOG'},
-  {name:'MDB',            code:'MDB.US',  yf:'MDB'},
-  {name:'ORCL',           code:'ORCL.US', yf:'ORCL'},
-  {name:'CRWV',           code:'CRWV.US', yf:'CRWV'},
-  {name:'LMT',            code:'LMT.US',  yf:'LMT'},
-  {name:'NOC',            code:'NOC.US',  yf:'NOC'},
-  {name:'RTX',            code:'RTX.US',  yf:'RTX'},
-  {name:'LHX',            code:'LHX.US',  yf:'LHX'},
-  {name:'HON',            code:'HON.US',  yf:'HON'},
-  {name:'GD',             code:'GD.US',   yf:'GD'},
-  {name:'AAOI',           code:'AAOI.US', yf:'AAOI'},
-  {name:'AXTI',           code:'AXTI.US', yf:'AXTI'},
-  {name:'ONDS',           code:'ONDS.US', yf:'ONDS'},
-  {name:'RCAT',           code:'RCAT.US', yf:'RCAT'},
-  {name:'RKLB',           code:'RKLB.US', yf:'RKLB'},
-  {name:'ASTS',           code:'ASTS.US', yf:'ASTS'},
+  {name:'TSM',  code:'TSM.US', yf:'TSM'},
+  {name:'NVDA', code:'NVDA',   yf:'NVDA'},
+  {name:'GOOG', code:'GOOG',   yf:'GOOG'},
 ];
 
-// ── Auth state ────────────────────────────────────────────────────────────────
+// ── Auth & Sheet state ────────────────────────────────────────────────────────
 
 let tokenClient = null;
 let accessToken = sessionStorage.getItem('gAccessToken');
 let currentUser = JSON.parse(sessionStorage.getItem('gUser') || 'null');
+let userSheetId = sessionStorage.getItem('gSheetId') || null;
+
+function sheetsAPI() {
+  return `https://sheets.googleapis.com/v4/spreadsheets/${userSheetId}`;
+}
 
 // ── GIS initialization ────────────────────────────────────────────────────────
 
@@ -527,8 +447,10 @@ function signOut() {
 function clearAuth() {
   accessToken = null;
   currentUser = null;
+  userSheetId = null;
   sessionStorage.removeItem('gAccessToken');
   sessionStorage.removeItem('gUser');
+  sessionStorage.removeItem('gSheetId');
 }
 
 function handleAuthError(e) {
@@ -560,10 +482,49 @@ function showApp(user) {
   document.getElementById('appPage').style.display = '';
   document.getElementById('userName').textContent = user.name || user.email || '';
   const av = document.getElementById('userAvatar');
-  if (user.picture) {
-    av.src = user.picture;
-    av.style.display = 'block';
+  if (user.picture) { av.src = user.picture; av.style.display = 'block'; }
+}
+
+// ── Google Drive: find or create user's sheet ─────────────────────────────────
+
+async function findOrCreateSheet() {
+  // 搜尋使用者 Drive 中是否已有 stock-watchlist-db
+  const q = encodeURIComponent(
+    `name='${SHEET_NAME}' and mimeType='application/vnd.google-apps.spreadsheet' and trashed=false`
+  );
+  const searchResp = await fetch(
+    `https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)&pageSize=1`,
+    { headers: { Authorization: `Bearer ${accessToken}` } }
+  );
+  if (searchResp.status === 401) throw new Error('TOKEN_EXPIRED');
+  if (!searchResp.ok) throw new Error('Drive search failed');
+
+  const searchData = await searchResp.json();
+  if (searchData.files && searchData.files.length > 0) {
+    userSheetId = searchData.files[0].id;
+    sessionStorage.setItem('gSheetId', userSheetId);
+    return;
   }
+
+  // 找不到，建立新的（同時建立三個工作表）
+  const createResp = await fetch('https://sheets.googleapis.com/v4/spreadsheets', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      properties: { title: SHEET_NAME },
+      sheets: [
+        { properties: { title: 'watchlist' } },
+        { properties: { title: 'portfolio' } },
+        { properties: { title: 'transactions' } },
+      ]
+    })
+  });
+  if (createResp.status === 401) throw new Error('TOKEN_EXPIRED');
+  if (!createResp.ok) throw new Error('建立 Google Sheet 失敗');
+
+  const newSheet = await createResp.json();
+  userSheetId = newSheet.spreadsheetId;
+  sessionStorage.setItem('gSheetId', userSheetId);
 }
 
 // ── Sheets API helpers ────────────────────────────────────────────────────────
@@ -579,19 +540,18 @@ async function sheetsRequest(url, options = {}) {
     const txt = await resp.text().catch(() => '');
     throw new Error(`Sheets ${resp.status}: ${txt}`);
   }
-  // 204 No Content
   if (resp.status === 204) return null;
   return resp.json();
 }
 
 async function ensureSheets() {
-  const data = await sheetsRequest(`${SHEETS_API}?fields=sheets.properties.title`);
+  const data = await sheetsRequest(`${sheetsAPI()}?fields=sheets.properties.title`);
   const existing = (data.sheets || []).map(s => s.properties.title);
   const needed = ['watchlist', 'portfolio', 'transactions'];
   const toCreate = needed.filter(n => !existing.includes(n));
   if (toCreate.length === 0) return;
 
-  await sheetsRequest(`${SHEETS_API}:batchUpdate`, {
+  await sheetsRequest(`${sheetsAPI()}:batchUpdate`, {
     method: 'POST',
     body: JSON.stringify({
       requests: toCreate.map(title => ({ addSheet: { properties: { title } } }))
@@ -601,24 +561,21 @@ async function ensureSheets() {
 
 async function sheetsRead(range) {
   const data = await sheetsRequest(
-    `${SHEETS_API}/values/${encodeURIComponent(range)}`
+    `${sheetsAPI()}/values/${encodeURIComponent(range)}`
   );
   return data.values || [];
 }
 
 async function sheetsWrite(range, values) {
   await sheetsRequest(
-    `${SHEETS_API}/values/${encodeURIComponent(range)}?valueInputOption=RAW`,
-    {
-      method: 'PUT',
-      body: JSON.stringify({ range, values })
-    }
+    `${sheetsAPI()}/values/${encodeURIComponent(range)}?valueInputOption=RAW`,
+    { method: 'PUT', body: JSON.stringify({ range, values }) }
   );
 }
 
 async function sheetsClear(range) {
   await sheetsRequest(
-    `${SHEETS_API}/values/${encodeURIComponent(range)}:clear`,
+    `${sheetsAPI()}/values/${encodeURIComponent(range)}:clear`,
     { method: 'POST', body: '{}' }
   );
 }
@@ -626,7 +583,6 @@ async function sheetsClear(range) {
 // ── Sync indicator ────────────────────────────────────────────────────────────
 
 function setSyncState(state) {
-  // state: 'syncing' | 'synced' | 'error' | ''
   const dot = document.getElementById('syncDot');
   if (!dot) return;
   dot.className = 'sync-dot' + (state ? ' ' + state : '');
@@ -640,16 +596,21 @@ async function loadFromSheets() {
   setStatus('loading', '從 Google Sheet 載入中…');
   setSyncState('syncing');
 
+  // 若尚無 SheetId，先搜尋或建立
+  if (!userSheetId) {
+    await findOrCreateSheet();
+  }
+
   await ensureSheets();
   const rows = await sheetsRead('watchlist!A:D');
 
-  // If empty or only a header row → write defaults for this user
-  const isNew = rows.length <= 1 || (rows.length === 1 && rows[0][0] === 'market');
+  // 空白或只有標題列 → 寫入預設清單
+  const isNew = rows.length === 0 || (rows.length === 1 && rows[0][0] === 'market');
 
   if (isNew) {
     twList = TW_DEF.map((s, i) => ({ ...s, id: 'tw_' + i }));
     usList = US_DEF.map((s, i) => ({ ...s, id: 'us_' + i }));
-    await saveToSheets(); // write defaults immediately (no debounce)
+    await saveToSheets();
   } else {
     const data = rows[0][0] === 'market' ? rows.slice(1) : rows;
     twList = data
@@ -669,14 +630,13 @@ async function loadFromSheets() {
 
 let saveTimer = null;
 
-// Debounced save — called after every list modification
 function save() {
   clearTimeout(saveTimer);
   saveTimer = setTimeout(saveToSheets, 1500);
 }
 
 async function saveToSheets() {
-  if (!accessToken) return;
+  if (!accessToken || !userSheetId) return;
   setSyncState('syncing');
   try {
     const header = [['market', 'name', 'code', 'yf']];
@@ -708,18 +668,6 @@ const cache = {};
 let twSort = null, usSort = null;
 let refreshTimer = null;
 const REFRESH_INTERVAL = 30;
-
-// ── Theme ─────────────────────────────────────────────────────────────────────
-
-function applyTheme(dark) {
-  document.body.classList.toggle('light', !dark);
-  document.getElementById('themeBtn').textContent = dark ? '☀' : '🌙';
-  localStorage.setItem('theme', dark ? 'dark' : 'light');
-}
-function toggleTheme() {
-  applyTheme(document.body.classList.contains('light'));
-}
-applyTheme(localStorage.getItem('theme') !== 'light');
 
 // ── Market hours helper ───────────────────────────────────────────────────────
 
@@ -756,12 +704,12 @@ function msUntilOpen(timezone, openH, openM, closeH, closeM) {
 
 function msUntilAnyOpen() {
   const delays = [];
-  if (twList.length) delays.push(msUntilOpen('Asia/Taipei',       9,  0, 13, 30));
-  if (usList.length) delays.push(msUntilOpen('America/New_York',  9, 30, 16,  0));
+  if (twList.length) delays.push(msUntilOpen('Asia/Taipei',      9,  0, 13, 30));
+  if (usList.length) delays.push(msUntilOpen('America/New_York', 9, 30, 16,  0));
   return delays.length ? Math.min(...delays) : 24*3600000;
 }
 
-// ── Price date formatter ──────────────────────────────────────────────────────
+// ── Price helpers ─────────────────────────────────────────────────────────────
 
 function fmtPriceDate(unixSecs, tz) {
   if (!unixSecs) return '';
@@ -1029,7 +977,7 @@ function closeReset() { document.getElementById('resetOverlay').classList.remove
 function doReset() {
   twList=TW_DEF.map((s,i)=>({...s,id:'tw_'+i}));
   usList=US_DEF.map((s,i)=>({...s,id:'us_'+i}));
-  saveToSheets(); // immediate write (no debounce for reset)
+  saveToSheets();
   renderGrid(twList,'twGrid'); renderGrid(usList,'usGrid');
   updateCounts(); closeReset(); refreshAll(true);
 }
@@ -1045,9 +993,7 @@ document.getElementById('addOverlay').addEventListener('keydown',e=>{
   if (e.key==='Escape') closeAdd();
 });
 
-// ── Boot ──────────────────────────────────────────────────────────────────────
-// GIS onload callback (initGIS) handles routing to landing or app page.
-// If GIS script fails to load, show landing as fallback.
+// GIS 載入失敗時的 fallback
 window.addEventListener('error', e => {
   if (e.filename && e.filename.includes('accounts.google.com')) {
     showLanding();
