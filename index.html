@@ -355,7 +355,7 @@ main{padding:14px 14px 0;max-width:1600px;margin:0 auto}
 // ── Constants ─────────────────────────────────────────────────────────────────
 
 const CLIENT_ID = '91146687688-abbhlq6b141kb7em67gsuqn3nfgc0fdr.apps.googleusercontent.com';
-const SCOPE     = 'openid profile email https://www.googleapis.com/auth/drive.file';
+const SCOPE     = 'openid profile email https://www.googleapis.com/auth/spreadsheets';
 const SHEET_NAME = 'stock-watchlist-db';
 
 // ── Default stock lists ───────────────────────────────────────────────────────
@@ -377,7 +377,7 @@ const US_DEF = [
 let tokenClient = null;
 let accessToken = sessionStorage.getItem('gAccessToken');
 let currentUser = JSON.parse(sessionStorage.getItem('gUser') || 'null');
-let userSheetId = sessionStorage.getItem('gSheetId') || null;
+let userSheetId = localStorage.getItem('stockapp_sheet_id') || null;
 
 function sheetsAPI() {
   return `https://sheets.googleapis.com/v4/spreadsheets/${userSheetId}`;
@@ -450,7 +450,7 @@ function clearAuth() {
   userSheetId = null;
   sessionStorage.removeItem('gAccessToken');
   sessionStorage.removeItem('gUser');
-  sessionStorage.removeItem('gSheetId');
+  // localStorage 的 stockapp_sheet_id 保留，下次登入可繼續使用同一張 Sheet
 }
 
 function handleAuthError(e) {
@@ -485,29 +485,17 @@ function showApp(user) {
   if (user.picture) { av.src = user.picture; av.style.display = 'block'; }
 }
 
-// ── Google Drive: find or create user's sheet ─────────────────────────────────
+// ── Sheets: get from localStorage or create new ───────────────────────────────
 
-async function findOrCreateSheet() {
-  // 搜尋使用者 Drive 中是否已有 stock-watchlist-db
-  const q = encodeURIComponent(
-    `name='${SHEET_NAME}' and mimeType='application/vnd.google-apps.spreadsheet' and trashed=false`
-  );
-  const searchResp = await fetch(
-    `https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)&pageSize=1`,
-    { headers: { Authorization: `Bearer ${accessToken}` } }
-  );
-  if (searchResp.status === 401) throw new Error('TOKEN_EXPIRED');
-  if (!searchResp.ok) throw new Error('Drive search failed');
-
-  const searchData = await searchResp.json();
-  if (searchData.files && searchData.files.length > 0) {
-    userSheetId = searchData.files[0].id;
-    sessionStorage.setItem('gSheetId', userSheetId);
-    return;
+async function getOrCreateSheet() {
+  const savedId = localStorage.getItem('stockapp_sheet_id');
+  if (savedId) {
+    userSheetId = savedId;
+    return false; // 既有 Sheet
   }
 
-  // 找不到，建立新的（同時建立三個工作表）
-  const createResp = await fetch('https://sheets.googleapis.com/v4/spreadsheets', {
+  // 用 Sheets API 建立新的試算表（含三個工作表）
+  const resp = await fetch('https://sheets.googleapis.com/v4/spreadsheets', {
     method: 'POST',
     headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -519,12 +507,21 @@ async function findOrCreateSheet() {
       ]
     })
   });
-  if (createResp.status === 401) throw new Error('TOKEN_EXPIRED');
-  if (!createResp.ok) throw new Error('建立 Google Sheet 失敗');
+  if (resp.status === 401) throw new Error('TOKEN_EXPIRED');
+  if (!resp.ok) throw new Error('建立 Sheet 失敗');
 
-  const newSheet = await createResp.json();
-  userSheetId = newSheet.spreadsheetId;
-  sessionStorage.setItem('gSheetId', userSheetId);
+  const data = await resp.json();
+  userSheetId = data.spreadsheetId;
+  localStorage.setItem('stockapp_sheet_id', userSheetId);
+  return true; // 新建立的 Sheet
+}
+
+// ── Sheet initialization headers ─────────────────────────────────────────────
+
+async function initSheetHeaders() {
+  // 寫入各工作表的中文標題列（watchlist 用英文 key 供程式解析）
+  await sheetsWrite('portfolio!A1:E1',     [['代號', '名稱', '持股數量', '平均成本', '市場']]);
+  await sheetsWrite('transactions!A1:F1',  [['日期', '代號', '名稱', '買賣', '價格', '股數']]);
 }
 
 // ── Sheets API helpers ────────────────────────────────────────────────────────
@@ -596,29 +593,43 @@ async function loadFromSheets() {
   setStatus('loading', '從 Google Sheet 載入中…');
   setSyncState('syncing');
 
-  // 若尚無 SheetId，先搜尋或建立
-  if (!userSheetId) {
-    await findOrCreateSheet();
-  }
+  const isNewSheet = await getOrCreateSheet();
 
-  await ensureSheets();
-  const rows = await sheetsRead('watchlist!A:D');
-
-  // 空白或只有標題列 → 寫入預設清單
-  const isNew = rows.length === 0 || (rows.length === 1 && rows[0][0] === 'market');
-
-  if (isNew) {
+  if (isNewSheet) {
+    // 新建立的 Sheet：寫入中文標題列和預設清單
     twList = TW_DEF.map((s, i) => ({ ...s, id: 'tw_' + i }));
     usList = US_DEF.map((s, i) => ({ ...s, id: 'us_' + i }));
+    await initSheetHeaders();
     await saveToSheets();
   } else {
-    const data = rows[0][0] === 'market' ? rows.slice(1) : rows;
-    twList = data
-      .filter(r => r[0] === 'tw' && r[1] && r[3])
-      .map((r, i) => ({ name: r[1], code: r[2] || r[3], yf: r[3], id: 'tw_' + i }));
-    usList = data
-      .filter(r => r[0] === 'us' && r[1] && r[3])
-      .map((r, i) => ({ name: r[1], code: r[2] || r[3], yf: r[3], id: 'us_' + i }));
+    // 既有 Sheet：確保工作表存在後讀取資料
+    try {
+      await ensureSheets();
+      const rows = await sheetsRead('watchlist!A:D');
+      const isEmpty = rows.length === 0 || (rows.length === 1 && rows[0][0] === 'market');
+
+      if (isEmpty) {
+        twList = TW_DEF.map((s, i) => ({ ...s, id: 'tw_' + i }));
+        usList = US_DEF.map((s, i) => ({ ...s, id: 'us_' + i }));
+        await saveToSheets();
+      } else {
+        const data = rows[0][0] === 'market' ? rows.slice(1) : rows;
+        twList = data
+          .filter(r => r[0] === 'tw' && r[1] && r[3])
+          .map((r, i) => ({ name: r[1], code: r[2] || r[3], yf: r[3], id: 'tw_' + i }));
+        usList = data
+          .filter(r => r[0] === 'us' && r[1] && r[3])
+          .map((r, i) => ({ name: r[1], code: r[2] || r[3], yf: r[3], id: 'us_' + i }));
+      }
+    } catch(e) {
+      if (e.message === 'TOKEN_EXPIRED') throw e;
+      // Sheet 可能已刪除，清除 localStorage 後下次重新建立
+      localStorage.removeItem('stockapp_sheet_id');
+      userSheetId = null;
+      console.error('loadFromSheets error:', e);
+      twList = TW_DEF.map((s, i) => ({ ...s, id: 'tw_' + i }));
+      usList = US_DEF.map((s, i) => ({ ...s, id: 'us_' + i }));
+    }
   }
 
   setSyncState('synced');

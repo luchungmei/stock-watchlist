@@ -93,3 +93,5 @@
   - https://www.googleapis.com/auth/drive.file（只能存取本應用程式建立的檔案）
 - 不使用 spreadsheets scope，避免存取使用者其他試算表
 - drive.file 說明：只能讀寫本 app 自己建立的 stock-watchlist-db，完全無法存取使用者其他 Drive 檔案
+- Sheet ID 儲存方式：存在 localStorage（key: stockapp_sheet_id）
+- 登入流程：先從 localStorage 讀取 Sheet ID，沒有就用 Sheets API 建立新的 stock-watchlist-db，建立後存入 localStorage
