@@ -849,9 +849,9 @@ function updateCounts() {
 // ── Data fetching ─────────────────────────────────────────────────────────────
 
 const PROXIES = [
-  u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
   u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
   u => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
+  u => `https://thingproxy.freeboard.io/fetch/${encodeURIComponent(u)}`,
 ];
 let _bestProxy = 0;
 
