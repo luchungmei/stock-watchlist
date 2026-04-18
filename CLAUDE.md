@@ -87,5 +87,9 @@
 - 字型：-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif
 
 ## OAuth 設定
-- Client ID 和 Sheet ID 請勿寫在此檔案
 - Token 存在 sessionStorage（關閉瀏覽器自動登出）
+- 權限範圍（scope）：
+  - openid profile email（取得使用者基本資訊）
+  - https://www.googleapis.com/auth/drive.file（只能存取本應用程式建立的檔案）
+- 不使用 spreadsheets scope，避免存取使用者其他試算表
+- drive.file 說明：只能讀寫本 app 自己建立的 stock-watchlist-db，完全無法存取使用者其他 Drive 檔案
